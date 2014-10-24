@@ -98,11 +98,11 @@ namespace Schyntax
                     for (var i = 0; i < DaysOfMonth.Length; ++i)
                     {
                         var range = DaysOfMonth[i].Copy();
-                        if (range.low < 0)
-                            range.low = daysInMonth + range.low + 1;
+                        if (range.Low < 0)
+                            range.Low = daysInMonth + range.Low + 1;
 
-                        if (range.high < 0)
-                            range.high = daysInMonth + range.high + 1;
+                        if (range.High < 0)
+                            range.High = daysInMonth + range.High + 1;
 
                         if (InRange(dayOfMonth, range, DateTime.DaysInMonth(month - 1, year), 1))
                         {
@@ -120,11 +120,11 @@ namespace Schyntax
                     for (var i = 0; i < DaysOfMonthExclude.Length; ++i)
                     {
                         var range = DaysOfMonthExclude[i].Copy();
-                        if (range.low < 0)
-                            range.low = daysInMonth + range.low + 1;
+                        if (range.Low < 0)
+                            range.Low = daysInMonth + range.Low + 1;
 
-                        if (range.high < 0)
-                            range.high = daysInMonth + range.high + 1;
+                        if (range.High < 0)
+                            range.High = daysInMonth + range.High + 1;
 
                         if (InRange(dayOfMonth, range, DateTime.DaysInMonth(month - 1, year), 1))
                         {
@@ -143,7 +143,6 @@ namespace Schyntax
                     continue;
 
                 // if we've gotten this far, then today is an applicable day, let's keep going with hour checks
-                var firstHour = true;
                 var hourCount = after ? 24 - hour : hour + 1;
                 for (; hourCount-- > 0; hour += inc, minute = initMinute, second = initSecond)
                 {
@@ -196,20 +195,16 @@ namespace Schyntax
 
         private static bool InRange(int value, Range<int> range, int lengthOfUnit, int min = 0)
         {
-            //function inRange (value, range, lengthOfUnit, min)
-            //{
-            //    min = min || 0;
-            //
-            if (range.isSplit) // range spans across the max value and loops back around
+            if (range.IsSplit) // range spans across the max value and loops back around
             {
-                if (value <= range.high || value >= range.low)
+                if (value <= range.High || value >= range.Low)
                 {
-                    if (range.modulus != null)
+                    if (range.Modulus != null)
                     {
-                        if (value >= range.low)
-                            return (value - range.low) % range.modulus == 0;
+                        if (value >= range.Low)
+                            return (value - range.Low) % range.Modulus == 0;
 
-                        return (value + lengthOfUnit - range.low) % range.modulus == 0;
+                        return (value + lengthOfUnit - range.Low) % range.Modulus == 0;
                     }
 
                     return true;
@@ -217,15 +212,14 @@ namespace Schyntax
             }
             else // not a split range (easier case)
             {
-                if (value >= range.low && value <= range.high)
+                if (value >= range.Low && value <= range.High)
                 {
-                    if (range.modulus != null)
-                        return (value - range.low) % range.modulus == 0;
+                    if (range.Modulus != null)
+                        return (value - range.Low) % range.Modulus == 0;
 
                     return true;
                 }
             }
-            //}
 
             return false;
 
@@ -235,17 +229,17 @@ namespace Schyntax
         private static bool InDateRange(int month, int day, int year, Range<Range<int>> range)
         {
             // first, check if in-between low and high dates.
-            if (range.isSplit)
+            if (range.IsSplit)
             {
-                if (month == range.low.month || month == range.high.month)
+                if (month == range.Low.Month || month == range.High.Month)
                 {
-                    if (month == range.low.month && day < range.low.day)
+                    if (month == range.Low.Month && day < range.Low.Day)
                         return false;
 
-                    if (month == range.high.month && day > range.high.day)
+                    if (month == range.High.Month && day > range.High.Day)
                         return false;
                 }
-                else if (!(month < range.high.month || month > range.low.month))
+                else if (!(month < range.High.Month || month > range.Low.Month))
                 {
                     return false;
                 }
@@ -253,38 +247,38 @@ namespace Schyntax
             else
             {
                 // start with month range check
-                if (month < range.low.month || month > range.high.month)
+                if (month < range.Low.Month || month > range.High.Month)
                     return false;
 
-                if (month == range.low.month || month == range.high.month)
+                if (month == range.Low.Month || month == range.High.Month)
                 {
                     // month is equal, so check month and day
-                    if (month == range.low.month && day < range.low.day)
+                    if (month == range.Low.Month && day < range.Low.Day)
                         return false;
 
-                    if (month == range.high.month && day > range.high.day)
+                    if (month == range.High.Month && day > range.High.Day)
                         return false;
                 }
             }
 
-            if (range.modulus == null) // if there's no modulus, in-between dates is the only comparison required
+            if (range.Modulus == null) // if there's no modulus, in-between dates is the only comparison required
                 return true;
 
 
             // figure out the actual date of the low date
             DateTime start;
-            if (range.isSplit && month <= range.high.month)
+            if (range.IsSplit && month <= range.High.Month)
             {
                 // start date is from previous year
-                start = DateTime.SpecifyKind(new DateTime(year - 1, range.low.month, range.low.day), DateTimeKind.Utc);
+                start = DateTime.SpecifyKind(new DateTime(year - 1, range.Low.Month, range.Low.Day), DateTimeKind.Utc);
             }
             else
             {
-                start = DateTime.SpecifyKind(new DateTime(year, range.low.month, range.low.day), DateTimeKind.Utc);
+                start = DateTime.SpecifyKind(new DateTime(year, range.Low.Month, range.Low.Day), DateTimeKind.Utc);
             }
 
             // check if start date was actually supposed to be February 29th, but isn't because of non-leap-year.
-            if (range.low.month == 1 && range.low.day == 29 && start.Month != 1)
+            if (range.Low.Month == 1 && range.Low.Day == 29 && start.Month != 1)
             {
                 // bump the start day back to February 28th so that modulus schemes work based on that imaginary date
                 // but seriously, people should probably just expect weird results if they're doing something that stupid.
@@ -295,38 +289,38 @@ namespace Schyntax
             //var dayCount = Math.round((current - start) / (24 * 60 * 60 * 1000));
             var dayCount = Math.Round((current - start).TotalDays);
 
-            return dayCount % range.modulus == 0;
+            return dayCount % range.Modulus == 0;
         }
     }
 
     public class Range<T>
     {
-        public T low { get; set; }
-        public T high { get; set; }
-        public bool isSplit { get; set; }
-        public int? modulus { get; set; }
+        public T Low { get; set; }
+        public T High { get; set; }
+        public bool IsSplit { get; set; }
+        public int? Modulus { get; set; }
 
         public Range<T> Copy()
         {
             return new Range<T>
             {
-                low = low,
-                high = high,
-                isSplit = isSplit,
-                modulus = modulus
+                Low = Low,
+                High = High,
+                IsSplit = IsSplit,
+                Modulus = Modulus
             };
         }
 
-        public T day
+        public T Day
         {
-            get { return high; }
-            set { high = value; }
+            get { return High; }
+            set { High = value; }
         }
 
-        public T month
+        public T Month
         {
-            get { return low; }
-            set { low = value; }
+            get { return Low; }
+            set { Low = value; }
         }
     }
 }
