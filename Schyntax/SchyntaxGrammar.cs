@@ -18,11 +18,11 @@ namespace Schyntax
             var FRIDAY = new RegexBasedTerminal("FRIDAY", @"\b(fr|friday|friday)\b");
             var SATURDAY = new RegexBasedTerminal("SATURDAY", @"\b(sa|sat|saturday)\b");
 
-            //var MIXIN_IDENTIFIER = new RegexBasedTerminal("MIXIN_IDENTIFIER", @"\$[a-z][a-z0-9_]");
+            var COMMA = new KeyTerm(",", "COMMA");
+            var COMMA_OR_SPACE = new RegexBasedTerminal("COMMA_OR_SPACE", @"[ ,]");
 
             var POSITIVE_INTEGER = new RegexBasedTerminal("POSITIVE_INTEGER", @"[0-9]+");
             var NEGATIVE_INTEGER = new RegexBasedTerminal("NEGATIVE_INTEGER", @"\-[0-9]+");
-
 
             var SECONDS = new RegexBasedTerminal("SECONDS", @"\b(s|sec|second|seconds|secondofminute|secondsofminute)\b");
             var MINUTES = new RegexBasedTerminal("MINUTES", @"\b(m|min|minute|minutes|minuteofhour|minutesofhour)\b");
@@ -34,19 +34,11 @@ namespace Schyntax
             var GroupOrExpressionList = new NonTerminal("GroupOrExpressionList");
             var GroupOrExpression = new NonTerminal("GroupOrExpression");
             var Group = new NonTerminal("Group");
-            var Expression = new NonTerminal("Expression", typeof(ExpressionNode));
+            var Expression = new NonTerminal("Expression");
             var ExpressionList = new NonTerminal("ExpressionList");
 
             var IntegerTypeExpression = new NonTerminal("IntegerTypeExpression");
-
             var IntegerArgumentList = new NonTerminal("IntegerArgumentList");
-            var SecondsExpression = new NonTerminal("SecondsExpression", typeof(ExpressionNode));
-            var MinutesExpression = new NonTerminal("MinutesExpression");
-            var HoursExpression = new NonTerminal("HoursExpression");
-
-            var DaysOfWeekExpression = new NonTerminal("DaysOfWeekExpression");
-            var DaysOfMonthExpression = new NonTerminal("DaysOfMonthExpression");
-            var DatesExpression = new NonTerminal("DatesExpression");
 
             var DateArgumentList = new NonTerminal("DateArgumentList");
             var DateArgument = new NonTerminal("DateArgument");
@@ -61,45 +53,35 @@ namespace Schyntax
             var DateLiteral = new NonTerminal("DateLiteral");
             var DayRange = new NonTerminal("DayRange");
             var IntegerRange = new NonTerminal("IntegerRange");
-            var IntegerLiteral = new NonTerminal("IntegerLiteral", typeof(IntegerLiteralNode));
+            var IntegerLiteral = new NonTerminal("IntegerLiteral");
             var DayOrIntegerLiteral = new NonTerminal("DayOrIntegerLiteral");
             var DayLiteral = new NonTerminal("DayLiteral");
             var OptionalModulus = new NonTerminal("OptionalModulus");
             // ReSharper restore InconsistentNaming
 
-            //GroupOrExpressionList.Rule
-            //    = GroupOrExpression
-            //    | GroupOrExpressionList + GroupOrExpression
-            //    | GroupOrExpressionList + "," + GroupOrExpression
-                //;
-
-            //GroupOrExpression.Rule =
-                //= Group
-                //Expression
+            GroupOrExpressionList.Rule
+                = MakeListRule(GroupOrExpressionList, COMMA_OR_SPACE, GroupOrExpression)
                 ;
 
-            //Group.Rule = 
-            //    "(" + ExpressionList + ")"
-            //    ;
+            GroupOrExpression.Rule
+                = Group
+                | Expression
+                ;
+
+            Group.Rule = 
+                "(" + ExpressionList + ")"
+                ;
 
 
-            //ExpressionList.Rule 
-            //    = Expression
-            //    | ExpressionList + Expression
-            //    | ExpressionList + "," + Expression
-            //    ;
+            ExpressionList.Rule 
+                = MakeListRule(ExpressionList, COMMA_OR_SPACE, Expression)
+                ;
 
 
             Expression.Rule
                 = IntegerTypeExpression + "(" + IntegerArgumentList + ")"
-                //| DATES + "(" + DateArgumentList + ")"
-                //| DAYS_OF_WEEK + "(" + DayArgumentList + ")"
-                ;
-            //    | MinutesExpression
-            //    | HoursExpression
-            //    | DaysOfWeekExpression
-            //    | DaysOfMonthExpression
-            //    | DatesExpression
+                | DATES + "(" + DateArgumentList + ")"
+                | DAYS_OF_WEEK + "(" + DayArgumentList + ")"
                 ;
 
             IntegerTypeExpression.Rule
@@ -108,131 +90,93 @@ namespace Schyntax
                 | HOURS
                 | DAYS_OF_MONTH
                 ;
-                
             
+            /* --- Arguments --- */
 
-            //SecondsExpression.Rule
-            //    //= SECONDS + "(" + ")"
-            //    //| SECONDS + "(" + IntegerArgumentList + ")"
-            //    = SECONDS + "(" + IntegerLiteral + ")"
-            //    ;
-
-            //MinutesExpression.Rule 
-            //    = MINUTES + "(" + ")"
-            //    | MINUTES + "(" + IntegerArgumentList + ")"
-            //    ;
-
-            //HoursExpression.Rule 
-            //    = HOURS + "(" + ")"
-            //    | HOURS + "(" + IntegerArgumentList + ")"
-            //    ;
-
-            //DaysOfWeekExpression.Rule
-            //    = DAYS_OF_WEEK + "(" + ")"
-            //    | DAYS_OF_WEEK + "(" + DayArgumentList + ")"
-            //    ;
-
-            //DaysOfMonthExpression.Rule
-            //    = DAYS_OF_MONTH + "(" + ")"
-            //    | DAYS_OF_MONTH + "(" + IntegerArgumentList + ")"
-            //    ;
-
-            //DatesExpression.Rule
-            //    = DATES + "(" + ")"
-            //    | DATES + "(" + DateArgumentList + ")"
-            //    ;
-
-            ///* --- Arguments --- */
-
-            //DateArgumentList.Rule
-            //    = DateArgument
-            //    | DateArgumentList + "," + DateArgument
-            //    ;
+            DateArgumentList.Rule
+                = MakePlusRule(DateArgumentList, COMMA, DateArgument)
+                ;
 
             IntegerArgumentList.Rule
-                //= IntegerArgument
-                //| IntegerArgumentList + "," + IntegerArgument
-                = IntegerLiteral
-                | Empty
+                = MakeStarRule(IntegerArgumentList, COMMA, IntegerArgument)
                 ;
             
-            //DayArgumentList.Rule
-            //    = DayArgument
-            //    | DayArgumentList + "," + DayArgument
-            //    ;
+            DayArgumentList.Rule
+                = MakeStarRule(DayArgumentList, COMMA, DayArgument)
+                ;
 
-            //DateArgument.Rule
-            //    = OptionalExclude + ModulusLiteral
-            //    | OptionalExclude + DateRange + OptionalModulus
-            //    ;
+            DateArgument.Rule
+                = OptionalExclude + ModulusLiteral
+                | OptionalExclude + DateRange + OptionalModulus
+                ;
 
-            //IntegerArgument.Rule
-                //= OptionalExclude + ModulusLiteral
-                //| OptionalExclude + IntegerRange + OptionalModulus
-                //;
+            IntegerArgument.Rule
+                = OptionalExclude + ModulusLiteral
+                | OptionalExclude + IntegerRange + OptionalModulus
+                ;
 
-            //DayArgument.Rule
-            //    = OptionalExclude + ModulusLiteral
-            //    | OptionalExclude + DayRange + OptionalModulus
-            //    ;
+            DayArgument.Rule
+                = OptionalExclude + ModulusLiteral
+                | OptionalExclude + DayRange + OptionalModulus
+                ;
 
-            //OptionalExclude.Rule
-            //    = "!"
-            //    | Empty
-            //    ;
+            OptionalExclude.Rule
+                = "!"
+                | Empty
+                ;
 
-            //OptionalModulus.Rule
-            //    = ModulusLiteral
-            //    | Empty
-            //    ;
+            OptionalModulus.Rule
+                = ModulusLiteral
+                | Empty
+                ;
 
             /* --- Ranges --- */
 
-            //DateRange.Rule
-            //    = DateLiteral
-            //    | DateLiteral + ".." + DateLiteral
-            //    ;
+            DateRange.Rule
+                = DateLiteral
+                | DateLiteral + ".." + DateLiteral
+                ;
 
-            //IntegerRange.Rule
-            //    = IntegerLiteral
-            //    | IntegerLiteral + ".." + IntegerLiteral
-            //    ;
+            IntegerRange.Rule
+                = IntegerLiteral
+                | IntegerLiteral + ".." + IntegerLiteral
+                ;
 
-            //DayRange.Rule
-            //    = DayOrIntegerLiteral
-            //    | DayOrIntegerLiteral + ".." + DayOrIntegerLiteral
-            //    ;
+            DayRange.Rule
+                = DayOrIntegerLiteral
+                | DayOrIntegerLiteral + ".." + DayOrIntegerLiteral
+                ;
 
             /* --- Literals --- */
 
-            //DateLiteral.Rule
-            //    = POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
-            //    | POSITIVE_INTEGER + "/" + POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
-            //    ;
+            DateLiteral.Rule
+                = POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
+                | POSITIVE_INTEGER + "/" + POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
+                ;
 
-            //DayLiteral.Rule
-            //    = SUNDAY
-            //    | MONDAY
-            //    | TUESDAY
-            //    | WEDNESDAY
-            //    | THURSDAY
-            //    | FRIDAY
-            //    | SATURDAY
-            //    ;
+            DayLiteral.Rule
+                = SUNDAY
+                | MONDAY
+                | TUESDAY
+                | WEDNESDAY
+                | THURSDAY
+                | FRIDAY
+                | SATURDAY
+                ;
 
             IntegerLiteral.Rule
                 = POSITIVE_INTEGER
                 | NEGATIVE_INTEGER
                 ;
 
-            //DayOrIntegerLiteral.Rule
-            //    = DayLiteral
-            //    | IntegerLiteral
-            //    ;
+            DayOrIntegerLiteral.Rule
+                = DayLiteral
+                | IntegerLiteral
+                ;
 
-            //ModulusLiteral.Rule
-            //    = "%" + POSITIVE_INTEGER
-            //    ;
+            ModulusLiteral.Rule
+                = "%" + POSITIVE_INTEGER
+                ;
 
             // Punctuation
             this.MarkTransient(Group, GroupOrExpression, IntegerArgumentList, IntegerTypeExpression);

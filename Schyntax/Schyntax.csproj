@@ -45,7 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SchyntaxAst.cs" />
+    <Compile Include="RuleGroup.cs" />
+    <Compile Include="Schedule.cs" />
+    <Compile Include="ScheduleBuilder.cs" />
     <Compile Include="SchyntaxGrammar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
