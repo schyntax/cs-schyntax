@@ -9,17 +9,20 @@ using Irony.Parsing;
 // ReSharper disable once CheckNamespace
 namespace Schyntax.Ast
 {
+    public interface ISchyntaxAstNode
+    {
+    }
 
-    public abstract class SchyntaxAstNode : IAstNodeInit
+    public abstract class SchyntaxAstNode : ISchyntaxAstNode, IAstNodeInit
     {
         public abstract void Init(AstContext context, ParseTreeNode parseNode);
     }
 
-    public class SchyntaxAstNodeList : List<SchyntaxAstNode>, IAstNodeInit
+    public class SchyntaxAstNodeList : List<ISchyntaxAstNode>, ISchyntaxAstNode, IAstNodeInit
     {
         public void Init(AstContext context, ParseTreeNode parseNode)
         {
-            Add((SchyntaxAstNode)parseNode.ChildNodes[0].AstNode);
+            Add((ISchyntaxAstNode)parseNode.ChildNodes[0].AstNode);
         }
     }
 

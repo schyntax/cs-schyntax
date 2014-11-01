@@ -12,7 +12,16 @@ namespace Schyntax
             
             // ReSharper disable InconsistentNaming
 
-            //terminals
+            // Terminals
+
+            // Punctuation
+            var COMMA = new KeyTerm(",", "COMMA");
+            var ANY = new KeyTerm("*", "ANY");
+            var EXCLUDE = new KeyTerm("!", "EXCLUDE");
+            var MODULUS = new KeyTerm("%", "MODULUS");
+            var COMMA_OR_SPACE = new RegexBasedTerminal("COMMA_OR_SPACE", "[, ]");
+
+            // Days of the week
             var SUNDAY = new RegexBasedTerminal("SUNDAY", @"\b(su|sun|sunday)\b");
             var MONDAY = new RegexBasedTerminal("MONDAY", @"\b(mo|mon|monday)\b");
             var TUESDAY = new RegexBasedTerminal("TUESDAY", @"\b(tu|tue|tuesday)\b");
@@ -21,18 +30,17 @@ namespace Schyntax
             var FRIDAY = new RegexBasedTerminal("FRIDAY", @"\b(fr|fri|friday|friday)\b");
             var SATURDAY = new RegexBasedTerminal("SATURDAY", @"\b(sa|sat|saturday)\b");
             var WEEKDAY_INTEGER = new RegexBasedTerminal("WEEKDAY_INTEGER", @"\b[1-7]\b");
-
-            var COMMA = new KeyTerm(",", "COMMA");
-            var ANY = new KeyTerm("*", "ANY");
-            var EXCLUDE = new KeyTerm("!", "EXCLUDE");
-            var MODULUS = new KeyTerm("%", "MODULUS");
             
-            //var COMMA_OR_SPACE = new RegexBasedTerminal("COMMA_OR_SPACE", @"[ ,]");
+            // Date values
+            // Irony really does not like backref'ed regexes
+            var DATE_WITH_SLASH_VALUE = new RegexBasedTerminal("DATE_WITH_SLASH_VALUE", @"(\d\d(\d\d)?\/)?\d\d\/\d\d");
+            var DATE_WITH_HYPHEN_VALUE = new RegexBasedTerminal("DATE_WITH_HYPHEN_VALUE", @"(\d\d(\d\d)?-)?\d\d-\d\d");
 
+            // Integer Values
             var POSITIVE_INTEGER = new RegexBasedTerminal("POSITIVE_INTEGER", @"[0-9]+");
             var NEGATIVE_INTEGER = new RegexBasedTerminal("NEGATIVE_INTEGER", @"\-[0-9]+");
-            var DATE_VALUE = new RegexBasedTerminal("DATE_VALUE", @"\b(\d\d(\d\d)?\/)?\d{1,2}\/\d{1,2}\b");
-
+            
+            // Rule types
             var SECONDS = new RegexBasedTerminal("SECONDS", @"\b(s|sec|second|seconds|secondofminute|secondsofminute)\b");
             var MINUTES = new RegexBasedTerminal("MINUTES", @"\b(m|min|minute|minutes|minuteofhour|minutesofhour)\b");
             var HOURS = new RegexBasedTerminal("HOURS", @"\b(h|hour|hours|hourofday|hoursofday)\b");
@@ -41,12 +49,16 @@ namespace Schyntax
             var DATES = new RegexBasedTerminal("DATES", @"\b(date|dates)\b");
 
             // Non terminals
-            //var Program = new NonTerminal("Program");
-            //var GroupOrExpressionList = new NonTerminal("GroupOrExpressionList");
-            //var GroupOrExpression = new NonTerminal("GroupOrExpression");
-            //var Group = new NonTerminal("Group");
+
+            // A Program is a 
+            var Program = new NonTerminal("Program");
+            var GroupOrRuleList = new NonTerminal("GroupOrRuleList", typeof(SchyntaxAstNodeList));
+            var GroupOrRule = new NonTerminal("GroupOrRule");
+
+            var Group = new NonTerminal("Group", typeof(SchyntaxAstNodeList));
+            var RuleList = new NonTerminal("RuleList", typeof(SchyntaxAstNodeList));
+
             var Rule = new NonTerminal("Expression", typeof(RuleNode));
-            //var ExpressionList = new NonTerminal("ExpressionList");
 
             var IntegerRuleType = new NonTerminal("IntegerRuleType", typeof(IntegerRuleTypeNode));
             var IntegerRuleArgumentList = new NonTerminal("IntegerRuleArgumentList", typeof(SchyntaxAstNodeList));
@@ -66,38 +78,35 @@ namespace Schyntax
 
             var OptionalExclude = new NonTerminal("OptionalExclude");
             var ModulusModifier = new NonTerminal("OptionalModulus", typeof(ModulusValueNode));
-
             
-
             // ReSharper restore InconsistentNaming
+            Program.Rule
+                = GroupOrRuleList + Eof
+                ;
 
-            //Program.Rule
-            //    = GroupOrExpressionList + Eof
-            //    ;
-            
-            //GroupOrExpressionList.Rule
-            //    = MakeListRule(GroupOrExpressionList, COMMA_OR_SPACE, GroupOrExpression)
-            //    ;
+            GroupOrRuleList.Rule
+                = GroupOrRuleList + COMMA_OR_SPACE + GroupOrRule
+                | GroupOrRule
+                ;
 
-            //GroupOrExpression.Rule
-            //    = Group
-            //    | Expression
-            //    ;
+            GroupOrRule.Rule
+                = Group
+                | Rule
+                ;
 
-            //Group.Rule = 
-            //    "(" + ExpressionList + ")"
-            //    ;
+            Group.Rule
+                = "(" + RuleList + ")"
+                ;
 
-
-            //ExpressionList.Rule 
-            //    = MakeListRule(ExpressionList, COMMA_OR_SPACE, Expression)
-            //    ;
-
+            RuleList.Rule
+                = RuleList + COMMA_OR_SPACE + Rule
+                | Rule
+                ;
 
             Rule.Rule
-                = IntegerRuleType + "(" + IntegerRuleArgumentList + ")"
-                //| DATES + "(" + DateArgumentList + ")"
+                = DATES + "(" + DateRuleArgumentList + ")"
                 | DAYS_OF_WEEK + "(" + DayOfWeekRuleArgumentList + ")"
+                | IntegerRuleType + "(" + IntegerRuleArgumentList + ")"
                 ;
 
             IntegerRuleType.Rule
@@ -109,12 +118,13 @@ namespace Schyntax
             
             /* --- Arguments --- */
 
-            //DateArgumentList.Rule
-            //    = MakePlusRule(DateArgumentList, COMMA, DateArgument)
-            //    ;
+            DateRuleArgumentList.Rule
+                = DateRuleArgumentList + COMMA + DateRuleArgument
+                | DateRuleArgument
+                ;
 
+            
             IntegerRuleArgumentList.Rule
-                //= MakeListRule(IntegerArgumentList, COMMA, IntegerOrAnyArgument)
                 = IntegerRuleArgumentList + COMMA + IntegerRuleArgument
                 | IntegerRuleArgument
                 ;
@@ -123,11 +133,7 @@ namespace Schyntax
                 = DayOfWeekRuleArgumentList + COMMA + DayOfWeekRuleArgument
                 | DayOfWeekRuleArgument
                 ;
-
-            //DateArgument.Rule
-            //    = OptionalExclude + ModulusLiteral
-            //    | OptionalExclude + DateRange + OptionalModulus
-            //    ;
+            
 
             IntegerRuleArgument.Rule
                 = OptionalExclude + IntegerRange + ModulusModifier
@@ -141,6 +147,13 @@ namespace Schyntax
                 | OptionalExclude + ModulusModifier
                 ;
 
+            DateRuleArgument.Rule
+                = OptionalExclude + DateRange + ModulusModifier
+                | OptionalExclude + DateRange
+                | OptionalExclude + ModulusModifier
+                ;
+
+
             OptionalExclude.Rule
                 = EXCLUDE
                 | Empty
@@ -152,11 +165,11 @@ namespace Schyntax
 
             /* --- Ranges --- */
 
-            //DateRange.Rule
-            //    = DateLiteral
-            //    | DateLiteral + ".." + DateLiteral
-            //    | ANY
-            //    ;
+            DateRange.Rule
+                = DateValue + ".." + DateValue
+                | DateValue
+                //| ANY
+                ;
 
             IntegerRange.Rule
                 = IntegerValue + ".." + IntegerValue
@@ -172,10 +185,10 @@ namespace Schyntax
 
             /* --- Literals --- */
 
-            //DateLiteral.Rule
-            //    = POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
-            //    | POSITIVE_INTEGER + "/" + POSITIVE_INTEGER + "/" + POSITIVE_INTEGER
-            //    ;
+            IntegerValue.Rule
+                = POSITIVE_INTEGER
+                | NEGATIVE_INTEGER
+                ;
 
             DayOfWeekValue.Rule
                 = SUNDAY
@@ -188,22 +201,23 @@ namespace Schyntax
                 | WEEKDAY_INTEGER
                 ;
 
-            IntegerValue.Rule
-                = POSITIVE_INTEGER
-                | NEGATIVE_INTEGER
+            DateValue.Rule
+                = DATE_WITH_HYPHEN_VALUE
+                | DATE_WITH_SLASH_VALUE
                 ;
-
+            
             // Punctuation
 
-            MarkTransient(OptionalExclude);
+            MarkTransient(OptionalExclude, GroupOrRule, Program);
 
-            MarkPunctuation("/", "(", ")", "..");
+            MarkPunctuation("-", "/", "(", ")", "..");
             MarkPunctuation(COMMA, ANY, EXCLUDE, MODULUS);
 
             LanguageFlags |= LanguageFlags.CreateAst;
 
-            Root = Rule;
+            Root = Program;
         }
+
 
         public override void SkipWhitespace(ISourceStream source)
         {

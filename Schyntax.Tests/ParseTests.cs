@@ -1,7 +1,6 @@
 ﻿using System;
 using Irony.Parsing;
 using NUnit.Framework;
-using Schyntax.Ast;
 
 namespace Schyntax.Tests
 {
@@ -12,7 +11,10 @@ namespace Schyntax.Tests
         private SchyntaxGrammar _grammar;
         private ParseTree _tree;
 
-        //[TestCase("dates(12/25)")]
+        [TestCase("dates(12/25)")]
+        [TestCase("dates(12/25..12/31)")]
+        [TestCase("dates(2010/12/25)")]
+        [TestCase("dates(2010/12/25..2010/12/31)")]
         [TestCase("dom(1)")]
         [TestCase("dom(30)")]
         [TestCase("dom(29)")]
@@ -76,6 +78,10 @@ namespace Schyntax.Tests
         [TestCase("s(3%2)")]
         [TestCase("s(3..58%2)")]
         [TestCase("s(%3)")]
+        // Complex stuff
+        [TestCase("s(0) s(30)")]
+        [TestCase("(s(0) s(30))")]
+        [TestCase("(s(0) s(30)) s(!45)")]
         public void TestParse(string input)
         {
             DoParse(input);
@@ -85,7 +91,7 @@ namespace Schyntax.Tests
         public void SetUp()
         {
             _grammar = new SchyntaxGrammar();
-            _parser = new Parser(_grammar) { Context = { TracingEnabled = true } };
+            _parser = new Parser(_grammar) { Context = { TracingEnabled = false } };
             _tree = null;
         }
         
@@ -97,15 +103,14 @@ namespace Schyntax.Tests
 
             _tree = _parser.Parse(input);
 
-//            _parser.Context.ParserTrace.ForEach(pte => Console.WriteLine(
-//                @"Parser Trace: 
-//State: {0}
-//Input: {1}
-//IsError: {2}
-//StackTop: {3}
-//Message: {4}
-//-----------------------------------------------------
-//", pte.State, pte.Input, pte.IsError, pte.StackTop, pte.Message));
+            if (_parser.Context.ParserTrace.Count > 0)
+            {
+                Console.WriteLine("Parser Trace: ");
+                const string columns = @"{0, -5} {1, -7} {2, -30} {3, -30} {4}";
+                Console.WriteLine(columns, "State", "IsError", "StackTop", "Input", "Message");
+                Console.WriteLine(new string('-', 100));
+                _parser.Context.ParserTrace.ForEach(pte => Console.WriteLine(columns, pte.State, pte.IsError, pte.StackTop, "\"" + pte.Input + "\"", pte.Message));
+            }
 
             if (_tree != null)
             {
