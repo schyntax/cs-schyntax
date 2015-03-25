@@ -76,24 +76,27 @@ namespace Alt.Internals
 
         private LexMethod LexExpressionArgument()
         {
-            ConsumeOptionalTerm(Terms.Not);
-
-            var hasValues = ConsumeNumberDayOrDate(false);
-            if (hasValues)
+            if (!ConsumeOptionalTerm(Terms.Wildcard))
             {
-                // might be a range
-                if (ConsumeOptionalTerm(Terms.Range))
-                    ConsumeNumberDayOrDate(true);
-            }
+                ConsumeOptionalTerm(Terms.Not);
 
-            var hasInterval = ConsumeOptionalTerm(Terms.Interval);
-            if (hasInterval)
-            {
-                ConsumeTerm(Terms.PositiveInteger);
-            }
+                var hasValues = ConsumeNumberDayOrDate(false);
+                if (hasValues)
+                {
+                    // might be a range
+                    if (ConsumeOptionalTerm(Terms.Range))
+                        ConsumeNumberDayOrDate(true);
+                }
 
-            if (!hasValues && !hasInterval)
-                throw new Exception("Expected an argument at index " + _index);
+                var hasInterval = ConsumeOptionalTerm(Terms.Interval);
+                if (hasInterval)
+                {
+                    ConsumeTerm(Terms.PositiveInteger);
+                }
+
+                if (!hasValues && !hasInterval)
+                    throw new Exception("Expected an argument at index " + _index);
+            }
 
             if (!IsNextTerm(Terms.Comma) && !IsNextTerm(Terms.CloseParen))
                 throw new Exception("Expected a comma or close paren at index " + _index);
