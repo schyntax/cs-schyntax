@@ -45,7 +45,9 @@ namespace Alt.Internals
         protected void ThrowWrongTokenException(params TokenType[] expectedTokenTypes)
         {
             var next = Peek();
-            var msg = String.Format("Unexpected token type {0}. Was expecting one of: {1}\n\n{2}", next.Type, String.Join(", ", expectedTokenTypes), GetPointerToToken(next));
+            var msg = String.Format("Unexpected token type {0} at index {3}. Was expecting one of: {1}\n\n{2}", 
+                next.Type, String.Join(", ", expectedTokenTypes), GetPointerToToken(next), next.Index);
+
             throw new SchyntaxParseException(msg, next.Index, Input);
         }
 

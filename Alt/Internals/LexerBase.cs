@@ -154,7 +154,7 @@ namespace Alt.Internals
 
         protected void ThrowUnexpectedText(params TokenType[] expectedTokenTypes)
         {
-            var msg = String.Format("Unexpected input. Was expecting one of: {0}\n\n{1}", String.Join(", ", expectedTokenTypes), GetPointerToIndex(_index));
+            var msg = String.Format("Unexpected input at index {2}. Was expecting one of: {0}\n\n{1}", String.Join(", ", expectedTokenTypes), GetPointerToIndex(_index), _index);
             throw new SchyntaxParseException(msg, _index, Input);
         }
 
