@@ -42,8 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="Internals\Lexer.cs" />
     <Compile Include="Internals\LexerBase.cs" />
+    <Compile Include="Internals\Nodes.cs" />
+    <Compile Include="Internals\Parser.cs" />
+    <Compile Include="Internals\ParserBase.cs" />
     <Compile Include="Internals\Terms.cs" />
     <Compile Include="Internals\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

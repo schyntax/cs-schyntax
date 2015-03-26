@@ -11,7 +11,7 @@ namespace Alt.Internals
 
         private LexMethod LexPastEndOfInput()
         {
-            throw new Exception("Lexer was advanced past the end of the input.");
+            throw new Exception("Lexer was advanced past the end of the input." + PLEASE_REPORT_BUG_MSG);
         }
 
         private LexMethod LexList()
@@ -71,35 +71,31 @@ namespace Alt.Internals
                 return LexList;
             }
 
-            throw new Exception("Expected an expression at index " + _index);
+            ThrowUnexpectedText(TokenType.ExpressionName);
+            throw new Exception(); // should never actually hit
         }
 
         private LexMethod LexExpressionArgument()
         {
+            ConsumeOptionalTerm(Terms.Not);
+
             if (!ConsumeOptionalTerm(Terms.Wildcard))
             {
-                ConsumeOptionalTerm(Terms.Not);
-
-                var hasValues = ConsumeNumberDayOrDate(false);
-                if (hasValues)
+                if (ConsumeNumberDayOrDate(false))
                 {
                     // might be a range
                     if (ConsumeOptionalTerm(Terms.Range))
                         ConsumeNumberDayOrDate(true);
                 }
+            }
 
-                var hasInterval = ConsumeOptionalTerm(Terms.Interval);
-                if (hasInterval)
-                {
-                    ConsumeTerm(Terms.PositiveInteger);
-                }
-
-                if (!hasValues && !hasInterval)
-                    throw new Exception("Expected an argument at index " + _index);
+            if (ConsumeOptionalTerm(Terms.Interval))
+            {
+                ConsumeTerm(Terms.PositiveInteger);
             }
 
             if (!IsNextTerm(Terms.Comma) && !IsNextTerm(Terms.CloseParen))
-                throw new Exception("Expected a comma or close paren at index " + _index);
+                ThrowUnexpectedText(TokenType.Comma, TokenType.CloseParen);
 
             return LexList;
         }
@@ -135,7 +131,7 @@ namespace Alt.Internals
             }
 
             if (required)
-                throw new Exception("Expected a number, day, or date at index " + _index);
+                ThrowUnexpectedText(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
 
             return false;
         }

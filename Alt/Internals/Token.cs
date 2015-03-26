@@ -2,12 +2,14 @@
 {
     public class Token
     {
-        public TokenType Type { get; set; }
-        public string RawValue { get; set; }
-        public string Value { get; set; }
-        public int Index { get; set; }
-        public string LeadingTrivia { get; set; }
-        public string TrailingTrivia { get; set; }
+        public TokenType Type { get; internal set; }
+        public string RawValue { get; internal set; }
+        public string Value { get; internal set; }
+        public int Index { get; internal set; }
+        public string LeadingTrivia { get; internal set; }
+        public string TrailingTrivia { get; internal set; }
+
+        internal Token() { }
     }
 
     public enum TokenType

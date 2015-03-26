@@ -28,18 +28,20 @@ namespace Alt.Internals
         public static Terminal Friday { get; } = new Terminal(TokenType.DayLiteral, "FRIDAY", new Regex(@"\G(fr|fri|friday)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Saturday { get; } = new Terminal(TokenType.DayLiteral, "SATURDAY", new Regex(@"\G(sa|sat|saturday)(?:\b)", RegexOptions.IgnoreCase));
 
-        public static Terminal Seconds { get; } = new Terminal(TokenType.ExpressionName, "SECONDS", new Regex(@"\G(s|sec|second|seconds|secondofminute|secondsofminute)(?:\b)", RegexOptions.IgnoreCase));
-        public static Terminal Minutes { get; } = new Terminal(TokenType.ExpressionName, "MINUTES", new Regex(@"\G(m|min|minute|minutes|minuteofhour|minutesofhour)(?:\b)", RegexOptions.IgnoreCase));
-        public static Terminal Hours { get; } = new Terminal(TokenType.ExpressionName, "HOURS", new Regex(@"\G(h|hour|hours|hourofday|hoursofday)(?:\b)", RegexOptions.IgnoreCase));
-        public static Terminal DaysOfWeek { get; } = new Terminal(TokenType.ExpressionName, "DAYS_OF_WEEK", new Regex(@"\G(day|days|dow|dayofweek|daysofweek)(?:\b)", RegexOptions.IgnoreCase));
-        public static Terminal DaysOfMonth { get; } = new Terminal(TokenType.ExpressionName, "DAYS_OF_MONTH", new Regex(@"\G(dom|dayofmonth|daysofmonth)(?:\b)", RegexOptions.IgnoreCase));
-        public static Terminal Dates { get; } = new Terminal(TokenType.ExpressionName, "DATES", new Regex(@"\G(date|dates)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal Seconds { get; } = new Terminal(ExpressionType.Seconds, new Regex(@"\G(s|sec|second|seconds|secondofminute|secondsofminute)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal Minutes { get; } = new Terminal(ExpressionType.Minutes, new Regex(@"\G(m|min|minute|minutes|minuteofhour|minutesofhour)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal Hours { get; } = new Terminal(ExpressionType.Hours, new Regex(@"\G(h|hour|hours|hourofday|hoursofday)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal DaysOfWeek { get; } = new Terminal(ExpressionType.DaysOfWeek, new Regex(@"\G(day|days|dow|dayofweek|daysofweek)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal DaysOfMonth { get; } = new Terminal(ExpressionType.DaysOfMonth, new Regex(@"\G(dom|dayofmonth|daysofmonth)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal Dates { get; } = new Terminal(ExpressionType.Dates, new Regex(@"\G(date|dates)(?:\b)", RegexOptions.IgnoreCase));
 
         internal class Terminal
         {
             public TokenType TokenType { get; }
             public string Value { get; }
             public Regex Regex { get; }
+
+            internal Terminal(ExpressionType type, Regex regex) : this(TokenType.ExpressionName, type.ToString(), regex) { }
 
             internal Terminal(TokenType type, string value, Regex regex = null)
             {
@@ -61,23 +63,24 @@ namespace Alt.Internals
                             return null;
                     }
 
-                    return new Token()
-                    {
-                        Index = index,
-                        RawValue = Value,
-                        Value = Value,
-                    };
+                    return CreateToken(index, Value);
                 }
 
                 var match = Regex.Match(input, index);
                 if (!match.Success)
                     return null;
 
+                return CreateToken(index, match.Value, match.Value);
+            }
+
+            private Token CreateToken(int index, string raw, string value = null)
+            {
                 return new Token()
                 {
+                    Type = TokenType,
                     Index = index,
-                    RawValue = match.Value,
-                    Value = Value ?? match.Value,
+                    RawValue = raw,
+                    Value = Value ?? value,
                 };
             }
         }

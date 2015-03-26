@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Alt.Internals
 {
     public abstract class LexerBase
     {
+        protected const string PLEASE_REPORT_BUG_MSG = " This indicates a bug in Schyntax. Please open an issue on github.";
+
         protected enum ContextMode
         {
             Program,
@@ -66,7 +69,7 @@ namespace Alt.Internals
         protected ContextMode ExitContext()
         {
             if (_contextStack.Count == 1)
-                throw new Exception("The lexer attempted to exit the last context. This is a bug with Schyntax. Please report on github.");
+                throw new Exception("The lexer attempted to exit the last context." + PLEASE_REPORT_BUG_MSG);
 
             return _contextStack.Pop();
         }
@@ -94,7 +97,7 @@ namespace Alt.Internals
             if (IsEndNext)
             {
                 if (_contextStack.Count > 1)
-                    throw new Exception("Lexer reached the end of the input while in a nested context.");
+                    throw new Exception("Lexer reached the end of the input while in a nested context." + PLEASE_REPORT_BUG_MSG);
 
                 ConsumeToken(new Token() { Type = TokenType.EndOfInput, Index = _index, RawValue = "", Value = "" });
                 return true;
@@ -124,7 +127,7 @@ namespace Alt.Internals
 
             var tok = term.GetToken(Input, _index);
             if (tok == null)
-                throw new Exception("Expected " + term.TokenType + " at index " + _index);
+                ThrowUnexpectedText(term.TokenType);
 
             ConsumeToken(tok);
         }
@@ -147,6 +150,28 @@ namespace Alt.Internals
             tok.LeadingTrivia = _leadingTrivia;
             _leadingTrivia = "";
             _tokenQueue.Enqueue(tok);
+        }
+
+        protected void ThrowUnexpectedText(params TokenType[] expectedTokenTypes)
+        {
+            var msg = String.Format("Unexpected input. Was expecting one of: {0}\n\n{1}", String.Join(", ", expectedTokenTypes), GetPointerToIndex(_index));
+            throw new SchyntaxParseException(msg, _index, Input);
+        }
+
+        internal string GetPointerToIndex(int index)
+        {
+            var start = Math.Max(0, index - 20);
+            var length = Math.Min(Input.Length - start, 50);
+
+            StringBuilder sb = new StringBuilder(73);
+            sb.Append(Input.Substring(start, length));
+            sb.Append("\n");
+
+            for (var i = start; i < index; i++)
+                sb.Append(' ');
+
+            sb.Append('^');
+            return sb.ToString();
         }
     }
 }
