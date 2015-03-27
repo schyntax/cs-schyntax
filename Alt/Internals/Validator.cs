@@ -132,6 +132,22 @@ namespace Alt.Internals
             validator(expType, range.Start);
             if (range.End != null)
                 validator(expType, range.End);
+
+            if (expType == ExpressionType.Dates && range.End != null)
+            {
+                // special validation to make the date range is sane
+                var start = (DateValueNode)range.Start;
+                var end = (DateValueNode)range.End;
+
+                if (start.Year != null || end.Year != null)
+                {
+                    if (start.Year == null || end.Year == null)
+                        throw new SchyntaxParseException("Cannot mix full and partial dates in a date range.", Input, start.Index);
+
+                    if (!IsStartBeforeEnd(start, end))
+                        throw new SchyntaxParseException("End date of range is before the start date.", Input, start.Index);
+                }
+            }
         }
 
         private void SecondOrMinute(ExpressionType expType, ValueNode value)
@@ -190,6 +206,28 @@ namespace Alt.Internals
             }
 
             return ival;
+        }
+
+        // returns true if the start date is before or equal to the end date
+        private bool IsStartBeforeEnd(DateValueNode start, DateValueNode end)
+        {
+            if (start.Year < end.Year)
+                return true;
+
+            if (start.Year > end.Year)
+                return false;
+
+            // must be the same start and end year if we get here
+
+            if (start.Month < end.Month)
+                return true;
+
+            if (start.Month > end.Month)
+                return false;
+
+            // must be the same month
+
+            return start.Day <= end.Day;
         }
 
         private static string ExpressionTypeToHumanString(ExpressionType type)
