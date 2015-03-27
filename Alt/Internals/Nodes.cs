@@ -80,7 +80,7 @@ namespace Alt.Internals
     public class ArgumentNode : Node
     {
         public bool IsExclusion { get; internal set; }
-        public bool IsInterval => Interval != null;
+        public bool HasInterval => Interval != null;
         public IntegerValueNode Interval { get; internal set; }
         public int IntervalValue => Interval.Value;
         public bool IsWildcard { get; internal set; }

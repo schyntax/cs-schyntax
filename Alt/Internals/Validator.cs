@@ -69,7 +69,7 @@ namespace Alt.Internals
 
             foreach (var arg in expression.Arguments)
             {
-                if (arg.IsInterval && arg.IntervalValue == 0)
+                if (arg.HasInterval && arg.IntervalValue == 0)
                 {
                     throw new SchyntaxParseException("\"%0\" is not a valid interval. If your intention was to include all " + 
                         ExpressionTypeToHumanString(expression.ExpressionType) + 
@@ -101,7 +101,7 @@ namespace Alt.Internals
 
                 if (arg.IsWildcard)
                 {
-                    if (arg.IsExclusion && !arg.IsInterval)
+                    if (arg.IsExclusion && !arg.HasInterval)
                     {
                         throw new SchyntaxParseException(
                             "Wildcards can't be excluded with the ! operator, except when part of an interval (using %)",
@@ -118,7 +118,7 @@ namespace Alt.Internals
                     Range(expression.ExpressionType, arg.Range, validator);
                 }
 
-                if (arg.IsInterval)
+                if (arg.HasInterval)
                 {
                     validator(ExpressionType.IntervalValue, arg.Interval);
                 }
@@ -157,7 +157,7 @@ namespace Alt.Internals
 
         private void Hour(ExpressionType expType, ValueNode value)
         {
-            IntegerValue(expType, value, 0, 24);
+            IntegerValue(expType, value, 0, 23);
         }
 
         private void DayOfWeek(ExpressionType expType, ValueNode value)

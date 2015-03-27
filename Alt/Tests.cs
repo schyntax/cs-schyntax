@@ -87,8 +87,11 @@ namespace Alt
         {
             var parser = new Parser(input);
             var ast = parser.Parse();
+
             var validator = new Validator(input, ast);
             validator.AssertValid();
+
+            var ir = IrBuilder.CompileAst(ast);
         }
     }
 }
