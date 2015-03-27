@@ -86,7 +86,9 @@ namespace Alt
         public void TestParser(string input)
         {
             var parser = new Parser(input);
-            parser.Parse();
+            var ast = parser.Parse();
+            var validator = new Validator(input, ast);
+            validator.AssertValid();
         }
     }
 }

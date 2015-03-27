@@ -111,8 +111,7 @@ namespace Alt.Internals
             if (IsNext(TokenType.Interval))
             {
                 arg.AddToken(Advance());
-                var tok = Expect(TokenType.PositiveInteger);
-                arg.Interval = int.Parse(tok.Value);
+                arg.Interval = ParseIntegerValue(ExpressionType.IntervalValue);
             }
 
             return arg;
@@ -162,7 +161,15 @@ namespace Alt.Internals
             }
             else
             {
-                throw WrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
+                switch (expressionType)
+                {
+                    case ExpressionType.DaysOfMonth:
+                        throw WrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger);
+                    case ExpressionType.DaysOfWeek:
+                        throw WrongTokenException(TokenType.PositiveInteger, TokenType.DayLiteral);
+                    default:
+                        throw WrongTokenException(TokenType.PositiveInteger);
+                }
             }
 
             return val;

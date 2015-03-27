@@ -11,7 +11,7 @@ namespace Alt.Internals
 
         private LexMethod LexPastEndOfInput()
         {
-            throw new Exception("Lexer was advanced past the end of the input." + PLEASE_REPORT_BUG_MSG);
+            throw new Exception("Lexer was advanced past the end of the input." + SchyntaxException.PLEASE_REPORT_BUG_MSG);
         }
 
         private LexMethod LexList()

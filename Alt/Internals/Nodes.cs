@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Alt.Internals
@@ -8,6 +9,8 @@ namespace Alt.Internals
         private readonly List<Token> _tokens = new List<Token>();
 
         public IReadOnlyList<Token> Tokens => _tokens.AsReadOnly();
+
+        public int Index => Tokens[0].Index;
 
         internal void AddToken(Token token)
         {
@@ -47,6 +50,7 @@ namespace Alt.Internals
 
     public enum ExpressionType
     {
+        IntervalValue, // used internally by the parser (not a real expression type)
         Seconds,
         Minutes,
         Hours,
@@ -57,7 +61,7 @@ namespace Alt.Internals
 
     public class ExpressionNode : Node
     {
-        private readonly List<ArgumentNode> _arguments = new List<ArgumentNode>(); 
+        private readonly List<ArgumentNode> _arguments = new List<ArgumentNode>();
 
         public ExpressionType ExpressionType { get; }
         public IReadOnlyList<ArgumentNode> Arguments => _arguments.AsReadOnly();
@@ -76,12 +80,15 @@ namespace Alt.Internals
     public class ArgumentNode : Node
     {
         public bool IsExclusion { get; internal set; }
-        public bool IsInterval => Interval != 0;
-        public int Interval { get; internal set; }
+        public bool IsInterval => Interval != null;
+        public IntegerValueNode Interval { get; internal set; }
+        public int IntervalValue => Interval.Value;
         public bool IsWildcard { get; internal set; }
         public bool IsRange => Range?.End != null;
         public RangeNode Range { get; internal set; }
         public ValueNode Value => Range?.Start;
+
+        public int IntervalTokenIndex => Tokens.First(t => t.Type == TokenType.Interval).Index;
     }
 
     public class RangeNode : Node

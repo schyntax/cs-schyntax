@@ -6,8 +6,6 @@ namespace Alt.Internals
 {
     public abstract class LexerBase
     {
-        protected const string PLEASE_REPORT_BUG_MSG = " This indicates a bug in Schyntax. Please open an issue on github.";
-
         protected enum ContextMode
         {
             Program,
@@ -69,7 +67,7 @@ namespace Alt.Internals
         protected ContextMode ExitContext()
         {
             if (_contextStack.Count == 1)
-                throw new Exception("The lexer attempted to exit the last context." + PLEASE_REPORT_BUG_MSG);
+                throw new Exception("The lexer attempted to exit the last context." + SchyntaxException.PLEASE_REPORT_BUG_MSG);
 
             return _contextStack.Pop();
         }
@@ -97,7 +95,7 @@ namespace Alt.Internals
             if (IsEndNext)
             {
                 if (_contextStack.Count > 1)
-                    throw new Exception("Lexer reached the end of the input while in a nested context." + PLEASE_REPORT_BUG_MSG);
+                    throw new Exception("Lexer reached the end of the input while in a nested context." + SchyntaxException.PLEASE_REPORT_BUG_MSG);
 
                 ConsumeToken(new Token() { Type = TokenType.EndOfInput, Index = _index, RawValue = "", Value = "" });
                 return true;

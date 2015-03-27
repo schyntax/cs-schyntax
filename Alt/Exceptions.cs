@@ -5,6 +5,7 @@ namespace Alt
 {
     public abstract class SchyntaxException : Exception
     {
+        internal const string PLEASE_REPORT_BUG_MSG = " This indicates a bug in Schyntax. Please open an issue on github.";
         protected SchyntaxException(string message) : base(message) { }
     }
 
