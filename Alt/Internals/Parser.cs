@@ -27,7 +27,7 @@ namespace Alt.Internals
                 }
                 else
                 {
-                    ThrowWrongTokenException(TokenType.OpenCurly, TokenType.ExpressionName, TokenType.Comma);
+                    throw WrongTokenException(TokenType.OpenCurly, TokenType.ExpressionName, TokenType.Comma);
                 }
                 
                 if (IsNext(TokenType.Comma)) // optional comma
@@ -80,7 +80,7 @@ namespace Alt.Internals
                 }
                 else
                 {
-                    ThrowWrongTokenException(TokenType.CloseParen, TokenType.Comma);
+                    throw WrongTokenException(TokenType.CloseParen, TokenType.Comma);
                 }
             }
 
@@ -147,7 +147,7 @@ namespace Alt.Internals
             {
                 if (expressionType != ExpressionType.DaysOfMonth)
                 {
-                    throw new SchyntaxParseException("Negative values are only allowed in dayofmonth expressions.\n" + GetPointerToToken(Peek()), Peek().Index, Input);
+                    throw new SchyntaxParseException("Negative values are only allowed in dayofmonth expressions.", Input, Peek().Index);
                 }
 
                 var tok = Advance();
@@ -162,7 +162,7 @@ namespace Alt.Internals
             }
             else
             {
-                ThrowWrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
+                throw WrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
             }
 
             return val;

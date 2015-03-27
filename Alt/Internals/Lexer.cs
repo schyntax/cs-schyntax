@@ -71,8 +71,7 @@ namespace Alt.Internals
                 return LexList;
             }
 
-            ThrowUnexpectedText(TokenType.ExpressionName);
-            throw new Exception(); // should never actually hit
+            throw UnexpectedText(TokenType.ExpressionName);
         }
 
         private LexMethod LexExpressionArgument()
@@ -95,7 +94,7 @@ namespace Alt.Internals
             }
 
             if (!IsNextTerm(Terms.Comma) && !IsNextTerm(Terms.CloseParen))
-                ThrowUnexpectedText(TokenType.Comma, TokenType.CloseParen);
+                throw UnexpectedText(TokenType.Comma, TokenType.CloseParen);
 
             return LexList;
         }
@@ -131,7 +130,7 @@ namespace Alt.Internals
             }
 
             if (required)
-                ThrowUnexpectedText(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
+                throw UnexpectedText(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
 
             return false;
         }

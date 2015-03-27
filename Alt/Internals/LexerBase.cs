@@ -127,7 +127,7 @@ namespace Alt.Internals
 
             var tok = term.GetToken(Input, _index);
             if (tok == null)
-                ThrowUnexpectedText(term.TokenType);
+                throw UnexpectedText(term.TokenType);
 
             ConsumeToken(tok);
         }
@@ -152,26 +152,14 @@ namespace Alt.Internals
             _tokenQueue.Enqueue(tok);
         }
 
-        protected void ThrowUnexpectedText(params TokenType[] expectedTokenTypes)
+        protected SchyntaxParseException UnexpectedText(params TokenType[] expectedTokenTypes)
         {
-            var msg = String.Format("Unexpected input at index {2}. Was expecting one of: {0}\n\n{1}", String.Join(", ", expectedTokenTypes), GetPointerToIndex(_index), _index);
-            throw new SchyntaxParseException(msg, _index, Input);
-        }
+            var msg = "Unexpected input at index " + _index + ". Was expecting " +
+                (expectedTokenTypes.Length > 1
+                    ? "one of: " + String.Join(", ", expectedTokenTypes)
+                    : expectedTokenTypes[0].ToString());
 
-        internal string GetPointerToIndex(int index)
-        {
-            var start = Math.Max(0, index - 20);
-            var length = Math.Min(Input.Length - start, 50);
-
-            StringBuilder sb = new StringBuilder(73);
-            sb.Append(Input.Substring(start, length));
-            sb.Append("\n");
-
-            for (var i = start; i < index; i++)
-                sb.Append(' ');
-
-            sb.Append('^');
-            return sb.ToString();
+            return new SchyntaxParseException(msg, Input, _index);
         }
     }
 }

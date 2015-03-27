@@ -32,7 +32,7 @@ namespace Alt.Internals
         protected Token Expect(TokenType type)
         {
             if (!IsNext(type))
-                ThrowWrongTokenException(type);
+                throw WrongTokenException(type);
 
             return Advance();
         }
@@ -42,18 +42,16 @@ namespace Alt.Internals
             return Peek().Type == type;
         }
 
-        protected void ThrowWrongTokenException(params TokenType[] expectedTokenTypes)
+        protected SchyntaxParseException WrongTokenException(params TokenType[] expectedTokenTypes)
         {
             var next = Peek();
-            var msg = String.Format("Unexpected token type {0} at index {3}. Was expecting one of: {1}\n\n{2}", 
-                next.Type, String.Join(", ", expectedTokenTypes), GetPointerToToken(next), next.Index);
 
-            throw new SchyntaxParseException(msg, next.Index, Input);
-        }
+            var msg = "Unexpected token type " + next.Type + " at index " + next.Index + ". Was expecting " +
+                (expectedTokenTypes.Length > 1
+                    ? "one of: " + String.Join(", ", expectedTokenTypes)
+                    : expectedTokenTypes[0].ToString());
 
-        protected string GetPointerToToken(Token token)
-        {
-            return _lexer.GetPointerToIndex(token.Index);
+            return new SchyntaxParseException(msg, Input, next.Index);
         }
     }
 }
