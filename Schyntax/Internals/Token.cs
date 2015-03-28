@@ -1,4 +1,4 @@
-﻿namespace Alt.Internals
+﻿namespace Schyntax.Internals
 {
     public class Token
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     /// <summary>
     /// This is the data structure used by the runtime search algorithm.

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Alt.Internals;
+using Schyntax.Internals;
 
-namespace Alt
+namespace Schyntax
 {
     public class Schedule
     {

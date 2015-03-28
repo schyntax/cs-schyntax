@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     public abstract class LexerBase
     {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     public class Validator
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     public class Lexer : LexerBase
     {

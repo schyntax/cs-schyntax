@@ -1,7 +1,6 @@
 ﻿using System;
-using Alt;
-using Alt.Internals;
 using NUnit.Framework;
+using Schyntax.Internals;
 
 namespace Schyntax.Tests
 {

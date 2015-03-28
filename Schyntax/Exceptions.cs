@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Alt
+namespace Schyntax
 {
     public abstract class SchyntaxException : Exception
     {

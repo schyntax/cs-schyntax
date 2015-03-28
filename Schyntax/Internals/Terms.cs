@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     internal static class Terms
     {

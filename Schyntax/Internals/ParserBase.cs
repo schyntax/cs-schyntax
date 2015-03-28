@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Text;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     public abstract class ParserBase
     {

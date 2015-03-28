@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Alt.Internals
+namespace Schyntax.Internals
 {
     public static class IrBuilder
     {
