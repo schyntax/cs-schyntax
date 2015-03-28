@@ -73,8 +73,8 @@ namespace Alt.Internals
     {
         public bool IsRange { get; }
         public bool IsSplit { get; }
-        public int Start { get; }
-        public int End { get; }
+        public int Start { get; private set; }
+        public int End { get; private set; }
         public int Interval { get; }
         public bool HasInterval { get; }
 
@@ -86,6 +86,16 @@ namespace Alt.Internals
             Interval = interval;
             HasInterval = interval != 0;
             IsSplit = isSplit;
+        }
+
+        public IrIntegerRange CloneWithRevisedRange(int start, int end)
+        {
+            var range = (IrIntegerRange)base.MemberwiseClone();
+            range.Start = start;
+            if (IsRange)
+                range.End = end;
+
+            return range;
         }
     }
 

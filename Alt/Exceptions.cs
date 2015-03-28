@@ -41,4 +41,14 @@ namespace Alt
             Data["Input"] = input;
         }
     }
+
+    public sealed class ValidTimeNotFoundException : SchyntaxException
+    {
+        public const string NOT_FOUND_MSG = "A valid time was not found for the schedule.";
+
+        internal ValidTimeNotFoundException(string schedule, string message = NOT_FOUND_MSG) : base (message)
+        {
+            Data["Schedule"] = schedule;
+        }
+    }
 }

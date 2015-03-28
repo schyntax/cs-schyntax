@@ -42,6 +42,27 @@ namespace Alt.Internals
                 CompileExpression(irGroup, expression);
             }
 
+            // setup implied rules
+            if (irGroup.HasSeconds || irGroup.HasSecondsExcluded)
+            {
+                // don't need to setup any defaults if seconds are defined
+            }
+            else if (irGroup.HasMinutes || irGroup.HasMinutesExcluded)
+            {
+                irGroup.Seconds.Add(GetZeroInteger());
+            }
+            else if (irGroup.HasHours || irGroup.HasHoursExcluded)
+            {
+                irGroup.Seconds.Add(GetZeroInteger());
+                irGroup.Minutes.Add(GetZeroInteger());
+            }
+            else // only a date level expression was set
+            {
+                irGroup.Seconds.Add(GetZeroInteger());
+                irGroup.Minutes.Add(GetZeroInteger());
+                irGroup.Hours.Add(GetZeroInteger());
+            }
+
             return irGroup;
         }
 
@@ -95,6 +116,11 @@ namespace Alt.Internals
                 {
                     var end = (DateValueNode)arg.Range.End;
                     irEnd = new IrDate(end.Year, end.Month, end.Day);
+                }
+                else if (arg.HasInterval)
+                {
+                    // if there is an interval, but no end value specified, then the end value is implied
+                    irEnd = new IrDate(null, 12, 31);
                 }
 
                 // check for split range (spans January 1) - not applicable for dates with explicit years
@@ -158,6 +184,12 @@ namespace Alt.Internals
                 start = ((IntegerValueNode)arg.Range.Start).Value;
                 end = (arg.Range.End as IntegerValueNode)?.Value;
 
+                if (!end.HasValue && arg.HasInterval)
+                {
+                    // if there is an interval, but no end value specified, then the end value is implied
+                    end = wildEnd;
+                }
+
                 // check for a split range
                 if (end.HasValue && end < start)
                 {
@@ -175,6 +207,11 @@ namespace Alt.Internals
             }
 
             return new IrIntegerRange(start, end, arg.HasInterval ? arg.IntervalValue : 0, isSplit);
+        }
+
+        private static IrIntegerRange GetZeroInteger()
+        {
+            return new IrIntegerRange(0, null, 0, false);
         }
     }
 }

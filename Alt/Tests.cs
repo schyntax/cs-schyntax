@@ -93,5 +93,12 @@ namespace Alt
 
             var ir = IrBuilder.CompileAst(ast);
         }
+
+        [Test]
+        public void MaybeThisWorks()
+        {
+            var sch = new Schedule("min(47..18%3)");
+            Console.WriteLine(sch.Next());
+        }
     }
 }
