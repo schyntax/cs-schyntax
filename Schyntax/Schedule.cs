@@ -342,8 +342,8 @@ namespace Schyntax
                 // one of the range values is negative, so we need to convert it to a positive by counting back from the end of the month
                 var daysInMonth = DateTime.DaysInMonth(year, month);
                 range = range.CloneWithRevisedRange(
-                    daysInMonth + range.Start + 1,
-                    dayOfMonth + range.End + 1
+                    range.Start < 0 ? daysInMonth + range.Start + 1 : range.Start,
+                    range.End < 0 ? daysInMonth + range.End + 1 : range.End
                 );
             }
 
