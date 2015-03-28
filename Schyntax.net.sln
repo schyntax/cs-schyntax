@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schyntax", "Schyntax\Schynt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schyntax.Tests", "Schyntax.Tests\Schyntax.Tests.csproj", "{9DD8106F-71C7-4DFD-919A-4EE600962536}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alt", "Alt\Alt.csproj", "{6F9D1F40-87EA-4337-A7AE-9F9810F6CF27}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{9DD8106F-71C7-4DFD-919A-4EE600962536}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DD8106F-71C7-4DFD-919A-4EE600962536}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DD8106F-71C7-4DFD-919A-4EE600962536}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F9D1F40-87EA-4337-A7AE-9F9810F6CF27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F9D1F40-87EA-4337-A7AE-9F9810F6CF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F9D1F40-87EA-4337-A7AE-9F9810F6CF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F9D1F40-87EA-4337-A7AE-9F9810F6CF27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
