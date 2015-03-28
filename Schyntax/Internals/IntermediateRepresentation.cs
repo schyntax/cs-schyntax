@@ -19,51 +19,51 @@ namespace Schyntax.Internals
     public class IrGroup
     {
         private List<IrIntegerRange> _seconds;
-        public bool HasSeconds => _seconds != null && _seconds.Count > 1;
+        public bool HasSeconds => _seconds != null && _seconds.Count > 0;
         public List<IrIntegerRange> Seconds => _seconds ?? (_seconds = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _secondsExcluded;
-        public bool HasSecondsExcluded => _secondsExcluded != null && _secondsExcluded.Count > 1;
+        public bool HasSecondsExcluded => _secondsExcluded != null && _secondsExcluded.Count > 0;
         public List<IrIntegerRange> SecondsExcluded => _secondsExcluded ?? (_secondsExcluded = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _minutes;
-        public bool HasMinutes => _minutes != null && _minutes.Count > 1;
+        public bool HasMinutes => _minutes != null && _minutes.Count > 0;
         public List<IrIntegerRange> Minutes => _minutes ?? (_minutes = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _minutesExcluded;
-        public bool HasMinutesExcluded => _minutesExcluded != null && _minutesExcluded.Count > 1;
+        public bool HasMinutesExcluded => _minutesExcluded != null && _minutesExcluded.Count > 0;
         public List<IrIntegerRange> MinutesExcluded => _minutesExcluded ?? (_minutesExcluded = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _hours;
-        public bool HasHours => _hours != null && _hours.Count > 1;
+        public bool HasHours => _hours != null && _hours.Count > 0;
         public List<IrIntegerRange> Hours => _hours ?? (_hours = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _hoursExcluded;
-        public bool HasHoursExcluded => _hoursExcluded != null && _hoursExcluded.Count > 1;
+        public bool HasHoursExcluded => _hoursExcluded != null && _hoursExcluded.Count > 0;
         public List<IrIntegerRange> HoursExcluded => _hoursExcluded ?? (_hoursExcluded = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _daysOfWeek;
-        public bool HasDaysOfWeek => _daysOfWeek != null && _daysOfWeek.Count > 1;
+        public bool HasDaysOfWeek => _daysOfWeek != null && _daysOfWeek.Count > 0;
         public List<IrIntegerRange> DaysOfWeek => _daysOfWeek ?? (_daysOfWeek = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _daysOfWeekExcluded;
-        public bool HasDaysOfWeekExcluded => _daysOfWeekExcluded != null && _daysOfWeekExcluded.Count > 1;
+        public bool HasDaysOfWeekExcluded => _daysOfWeekExcluded != null && _daysOfWeekExcluded.Count > 0;
         public List<IrIntegerRange> DaysOfWeekExcluded => _daysOfWeekExcluded ?? (_daysOfWeekExcluded = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _daysOfMonth;
-        public bool HasDaysOfMonth => _daysOfMonth != null && _daysOfMonth.Count > 1;
+        public bool HasDaysOfMonth => _daysOfMonth != null && _daysOfMonth.Count > 0;
         public List<IrIntegerRange> DaysOfMonth => _daysOfMonth ?? (_daysOfMonth = new List<IrIntegerRange>());
 
         private List<IrIntegerRange> _daysOfMonthExcluded;
-        public bool HasDaysOfMonthExcluded => _daysOfMonthExcluded != null && _daysOfMonthExcluded.Count > 1;
+        public bool HasDaysOfMonthExcluded => _daysOfMonthExcluded != null && _daysOfMonthExcluded.Count > 0;
         public List<IrIntegerRange> DaysOfMonthExcluded => _daysOfMonthExcluded ?? (_daysOfMonthExcluded = new List<IrIntegerRange>());
 
         private List<IrDateRange> _dates;
-        public bool HasDates => _dates != null && _dates.Count > 1;
+        public bool HasDates => _dates != null && _dates.Count > 0;
         public List<IrDateRange> Dates => _dates ?? (_dates = new List<IrDateRange>());
 
         private List<IrDateRange> _datesExcluded;
-        public bool HasDatesExcluded => _datesExcluded != null && _datesExcluded.Count > 1;
+        public bool HasDatesExcluded => _datesExcluded != null && _datesExcluded.Count > 0;
         public List<IrDateRange> DatesExcluded => _datesExcluded ?? (_datesExcluded = new List<IrDateRange>());
 
         internal IrGroup() { }
