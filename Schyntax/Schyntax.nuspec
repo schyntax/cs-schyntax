@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>Schyntax</title>
+    <authors>Bret Copeland</authors>
+    <owners>Bret Copeland</owners>
+    <projectUrl>https://github.com/schyntax/cs-schyntax</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>Schedule Scheduler Task Runner</tags>
+  </metadata>
+</package>

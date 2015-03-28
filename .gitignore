@@ -11,7 +11,7 @@
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
+# build/
 [Bb]in/
 [Oo]bj/
 
@@ -155,7 +155,15 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 
+# Node.js
+node_modules
 
+# Roslyn Temporary Solution Files
+*.sln.ide/
 
-# GeoIPCity.dat file
-GeoIPCity.dat
+/artifacts
+
+# JetBrains IDE
+.idea
+
+.vs
