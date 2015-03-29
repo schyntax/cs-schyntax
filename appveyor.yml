@@ -5,7 +5,7 @@
 #---------------------------------#
 
 environment:
-  NUGET_RELEASE_VERSION: 0.9.0
+  NUGET_RELEASE_VERSION: 0.9.1
   NUGET_FILE: Schyntax\Schyntax.nuspec
   ASSEMBLY_FILE: Schyntax\Properties\AssemblyInfo.cs
 
