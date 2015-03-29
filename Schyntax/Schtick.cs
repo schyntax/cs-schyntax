@@ -23,8 +23,15 @@ namespace Schyntax
         /// <param name="autoRun">If true, Start() will be called on the task automatically.</param>
         /// <param name="name">Optional name for the task. This is not used by Schtick, but may be useful for application code.</param>
         /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
-        /// <param name="window">The period of time (in milliseconds) after an event should have run where it would still be appropriate to run it.
-        /// See Task Windows documentation for more details.</param>
+        /// <param name="window">
+        /// The period of time (in milliseconds) after an event should have run where it would still be appropriate to run it.
+        /// See Task Windows documentation for more details.
+        /// </param>
+        /// <param name="skipIfSlowCallback">
+        /// If true, and a callback does not complete before the next time it is supposed to be called, then it won't be called until the next
+        /// interval after it has completed. If false, then the callback will always be called once per interval, even though the number of calls
+        /// may start to get backed up.
+        /// </param>
         /// <returns></returns>
         public ScheduledTask AddTask(
             string schedule, 
@@ -136,7 +143,8 @@ namespace Schyntax
                 {
                     // check if we actually want to run the first event right away
                     var prev = Schedule.Previous();
-                    if (prev > DateTime.UtcNow.AddMilliseconds(-Window))
+                    lastKnownRun = lastKnownRun.AddSeconds(1); // add a second for good measure
+                    if (prev > lastKnownRun && prev > DateTime.UtcNow.AddMilliseconds(-Window))
                     {
                         data.FirstEvent = prev;
                         set = true;
@@ -179,7 +187,7 @@ namespace Schyntax
             // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
             while (IsRunning && data.ThreadVersion == _threadVersion)
             {
-                if (runOnNext || DateTime.UtcNow >= NextTime)
+                if (runOnNext || DateTime.UtcNow >= nextTime)
                 {
                     runOnNext = false;
 

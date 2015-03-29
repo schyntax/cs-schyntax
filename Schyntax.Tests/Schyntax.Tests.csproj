@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchtickTests.cs" />
     <Compile Include="SchyntaxTestSuite.cs" />
   </ItemGroup>
   <ItemGroup>
