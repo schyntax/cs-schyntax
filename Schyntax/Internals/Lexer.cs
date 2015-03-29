@@ -93,9 +93,6 @@ namespace Schyntax.Internals
                 ConsumeTerm(Terms.PositiveInteger);
             }
 
-            if (!IsNextTerm(Terms.Comma) && !IsNextTerm(Terms.CloseParen))
-                throw UnexpectedText(TokenType.Comma, TokenType.CloseParen);
-
             return LexList;
         }
 

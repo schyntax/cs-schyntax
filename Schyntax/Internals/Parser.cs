@@ -70,17 +70,14 @@ namespace Schyntax.Internals
             {
                 exp.AddArgument(ParseArgument(type));
 
-                if (IsNext(TokenType.Comma))
-                {
-                    exp.AddToken(Advance());
-                }
-                else if (IsNext(TokenType.CloseParen))
+                if (IsNext(TokenType.CloseParen))
                 {
                     break;
                 }
-                else
+
+                if (IsNext(TokenType.Comma)) // optional comma
                 {
-                    throw WrongTokenException(TokenType.CloseParen, TokenType.Comma);
+                    exp.AddToken(Advance());
                 }
             }
 
