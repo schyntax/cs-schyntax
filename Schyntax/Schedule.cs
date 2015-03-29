@@ -316,7 +316,7 @@ namespace Schyntax
 
             var start = new DateTime(startYear, range.Start.Month, startDay, 0, 0, 0, DateTimeKind.Utc);
             var current = new DateTime(year, month, dayOfMonth, 0, 0, 0, DateTimeKind.Utc);
-            var dayCount = (current - start).Days;
+            var dayCount = Math.Round((current - start).TotalDays);
 
             return (dayCount % range.Interval) == 0;
         }

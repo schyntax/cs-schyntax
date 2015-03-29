@@ -6,7 +6,7 @@ namespace Schyntax
     public abstract class SchyntaxException : Exception
     {
         internal const string PLEASE_REPORT_BUG_MSG = " This indicates a bug in Schyntax. Please open an issue on github.";
-        protected SchyntaxException(string message) : base(message) { }
+        protected SchyntaxException(string message, Exception innerException = null) : base(message, innerException) { }
     }
 
     public sealed class SchyntaxParseException : SchyntaxException
@@ -49,6 +49,18 @@ namespace Schyntax
         internal ValidTimeNotFoundException(string schedule, string message = NOT_FOUND_MSG) : base (message)
         {
             Data["Schedule"] = schedule;
+        }
+    }
+
+    public sealed class ScheduleCrashException : SchyntaxException
+    {
+        public ScheduledTask Task { get; }
+
+        internal ScheduleCrashException(string message, ScheduledTask task, Exception innerException) : base(message, innerException)
+        {
+            Task = task;
+            Data["TaskName"] = task.Name;
+            Data["Schedule"] = task.Schedule.OriginalText;
         }
     }
 }
