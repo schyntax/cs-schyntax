@@ -34,7 +34,7 @@ namespace Schyntax
 
         public DateTime Previous()
         {
-            return Next(DateTime.UtcNow);
+            return Previous(DateTime.UtcNow);
         }
 
         public DateTime Previous(DateTime atOrBefore)
