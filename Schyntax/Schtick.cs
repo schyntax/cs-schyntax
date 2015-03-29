@@ -150,6 +150,7 @@ namespace Schyntax
 
                 // start schedule thread
                 var thread = new Thread(RunSchedule);
+                thread.IsBackground = true;
                 thread.Start(data);
             }
         }
