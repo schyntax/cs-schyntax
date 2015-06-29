@@ -11,7 +11,7 @@ if (-not [Regex]::IsMatch($asmInfo, $pattern, [System.Text.RegularExpressions.Re
 $version = "$env:NUGET_RELEASE_VERSION"
 
 # make sure version follows the 0.0.0 format
-if (![Regex]::IsMatch($version, '^\d\.\d\.\d$'))
+if (![Regex]::IsMatch($version, '^\d+\.\d+\.\d+$'))
 {
 	Write-Error "Invalid NUGET_RELEASE_VERSION: $version"
 	Exit 1
@@ -21,7 +21,7 @@ if (![Regex]::IsMatch($version, '^\d\.\d\.\d$'))
 if ("$env:APPVEYOR_REPO_TAG" -ne "true") # non-tagged (pre-release build)
 {
 	# we want to increment the patch number for unstable builds
-	$version = [Regex]::Replace($version, '^(\d\.\d\.)(\d)$', {
+	$version = [Regex]::Replace($version, '^(\d+\.\d+\.)(\d+)$', {
 		param([System.Text.RegularExpressions.Match] $match)
 		$val = [int]::Parse($match.Groups[2].Value)
 		$val++
