@@ -24,7 +24,7 @@ namespace Schyntax
         /// <param name="name">Optional name for the task. This is not used by Schtick, but may be useful for application code.</param>
         /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
         /// <param name="window">
-        /// The period of time (in milliseconds) after an event should have run where it would still be appropriate to run it.
+        /// The period of time after an event should have run where it would still be appropriate to run it.
         /// See Task Windows documentation for more details.
         /// </param>
         /// <param name="skipIfSlowCallback">
@@ -39,13 +39,12 @@ namespace Schyntax
             bool autoRun = true, 
             string name = null, 
             DateTime lastKnownRun = default(DateTime), 
-            int window = 0,
+            TimeSpan window = default(TimeSpan),
             bool skipIfSlowCallback = true)
         {
-            var task = new ScheduledTask(this, new Schedule(schedule), callback)
+            var task = new ScheduledTask(this, new Schedule(schedule), window, callback)
             {
                 Name = name,
-                Window = window,
                 SkipIfSlowCallback = skipIfSlowCallback
             };
 
@@ -113,13 +112,14 @@ namespace Schyntax
         public Schedule Schedule { get; }
         public ScheduledTaskCallback Callback { get; }
         public DateTime NextTime { get; private set; }
-        public int Window { get; set; }
+        public TimeSpan Window { get; }
         public bool SkipIfSlowCallback { get; set; }
 
-        internal ScheduledTask(Schtick schtick, Schedule schedule, ScheduledTaskCallback callback)
+        internal ScheduledTask(Schtick schtick, Schedule schedule, TimeSpan window, ScheduledTaskCallback callback)
         {
             Schtick = schtick;
             Schedule = schedule;
+            Window = window;
             Callback = callback;
             IsAttached = true;
         }
@@ -139,12 +139,12 @@ namespace Schyntax
 
                 var set = false;
                 var data = new ScheduleThreadData { ThreadVersion = _threadVersion };
-                if (Window > 0 && lastKnownRun != default(DateTime))
+                if (Window > TimeSpan.Zero && lastKnownRun != default(DateTime))
                 {
                     // check if we actually want to run the first event right away
                     var prev = Schedule.Previous();
                     lastKnownRun = lastKnownRun.AddSeconds(1); // add a second for good measure
-                    if (prev > lastKnownRun && prev > DateTime.UtcNow.AddMilliseconds(-Window))
+                    if (prev > lastKnownRun && prev > (DateTime.UtcNow - Window))
                     {
                         data.FirstEvent = prev;
                         set = true;
