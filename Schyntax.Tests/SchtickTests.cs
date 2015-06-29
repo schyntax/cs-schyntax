@@ -64,11 +64,11 @@ namespace Schyntax.Tests
 
             // this should trigger an immediate event
             var window1Run = false;
-            var window1 = schtick.AddTask(sch, (task, run) => { window1Run = true; }, lastKnownRun: fiveSecAgo.AddMinutes(-1), window: TimeSpan.FromHours(1));
+            var window1 = schtick.AddTask(sch, (task, run) => { window1Run = true; }, lastKnownRun: fiveSecAgo.AddMinutes(-1), window: TimeSpan.FromMinutes(1));
 
             // this should not trigger an immediate event
             var window2Run = false;
-            var window2 = schtick.AddTask(sch, (task, run) => { window2Run = true; }, lastKnownRun: fiveSecAgo, window: TimeSpan.FromHours(1));
+            var window2 = schtick.AddTask(sch, (task, run) => { window2Run = true; }, lastKnownRun: fiveSecAgo, window: TimeSpan.FromMinutes(1));
             
             Thread.Sleep(1000);
 
