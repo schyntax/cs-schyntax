@@ -7,6 +7,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schyntax", "Schyntax\Schynt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schyntax.Tests", "Schyntax.Tests\Schyntax.Tests.csproj", "{9DD8106F-71C7-4DFD-919A-4EE600962536}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AB7A91B7-F791-43E7-9F25-2CB2243484E9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		LICENSE.MIT = LICENSE.MIT
+		README.md = README.md
+		Schyntax\Schyntax.nuspec = Schyntax\Schyntax.nuspec
+		Scripts\SetNugetVersion.ps1 = Scripts\SetNugetVersion.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
