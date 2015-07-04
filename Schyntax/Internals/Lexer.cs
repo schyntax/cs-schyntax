@@ -83,7 +83,7 @@ namespace Schyntax.Internals
                 if (ConsumeNumberDayOrDate(false))
                 {
                     // might be a range
-                    if (ConsumeOptionalTerm(Terms.Range))
+                    if (ConsumeOptionalTerm(Terms.RangeHalfOpen) || ConsumeOptionalTerm(Terms.RangeInclusive))
                         ConsumeNumberDayOrDate(true);
                 }
             }

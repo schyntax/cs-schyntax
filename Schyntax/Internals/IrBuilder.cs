@@ -134,7 +134,7 @@ namespace Schyntax.Internals
                 }
             }
 
-            var irArg = new IrDateRange(irStart, irEnd, arg.HasInterval ? arg.IntervalValue : 0, isSplit);
+            var irArg = new IrDateRange(irStart, irEnd, arg.HasInterval ? arg.IntervalValue : 0, isSplit, arg.Range?.IsHalfOpen ?? false);
             (arg.IsExclusion ? irGroup.DatesExcluded : irGroup.Dates).Add(irArg);
         }
 
@@ -206,12 +206,12 @@ namespace Schyntax.Internals
                 }
             }
 
-            return new IrIntegerRange(start, end, arg.HasInterval ? arg.IntervalValue : 0, isSplit);
+            return new IrIntegerRange(start, end, arg.HasInterval ? arg.IntervalValue : 0, isSplit, arg.Range?.IsHalfOpen ?? false);
         }
 
         private static IrIntegerRange GetZeroInteger()
         {
-            return new IrIntegerRange(0, null, 0, false);
+            return new IrIntegerRange(0, null, 0, false, false);
         }
     }
 }

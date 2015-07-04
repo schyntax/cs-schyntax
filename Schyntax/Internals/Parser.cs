@@ -119,7 +119,18 @@ namespace Schyntax.Internals
             var range = new RangeNode();
             range.Start = expressionType == ExpressionType.Dates ? (ValueNode)ParseDate() : ParseIntegerValue(expressionType);
 
-            if (IsNext(TokenType.Range))
+            var isRange = false;
+            if (IsNext(TokenType.RangeInclusive))
+            {
+                isRange = true;
+            }
+            else if (IsNext(TokenType.RangeHalfOpen))
+            {
+                isRange = true;
+                range.IsHalfOpen = true;
+            }
+
+            if (isRange)
             {
                 range.AddToken(Advance());
                 range.End = expressionType == ExpressionType.Dates ? (ValueNode)ParseDate() : ParseIntegerValue(expressionType);

@@ -19,7 +19,8 @@
         EndOfInput,
 
         // operators
-        Range,
+        RangeInclusive,
+        RangeHalfOpen,
         Interval,
         Not,
         OpenParen,

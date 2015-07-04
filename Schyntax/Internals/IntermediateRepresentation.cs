@@ -72,20 +72,27 @@ namespace Schyntax.Internals
     public class IrIntegerRange
     {
         public bool IsRange { get; }
+        public bool IsHalfOpen { get; }
         public bool IsSplit { get; }
         public int Start { get; private set; }
         public int End { get; private set; }
         public int Interval { get; }
         public bool HasInterval { get; }
 
-        internal IrIntegerRange(int start, int? end, int interval, bool isSplit)
+        internal IrIntegerRange(int start, int? end, int interval, bool isSplit, bool isHalfOpen)
         {
             Start = start;
-            End = end ?? 0;
-            IsRange = end.HasValue;
+
+            if (end.HasValue)
+            {
+                IsSplit = isSplit;
+                IsHalfOpen = isHalfOpen;
+                IsRange = true;
+                End = end.Value;
+            }
+
             Interval = interval;
             HasInterval = interval != 0;
-            IsSplit = isSplit;
         }
 
         public IrIntegerRange CloneWithRevisedRange(int start, int end)
@@ -102,6 +109,7 @@ namespace Schyntax.Internals
     public class IrDateRange
     {
         public bool IsRange { get; }
+        public bool IsHalfOpen { get; }
         public bool IsSplit { get; }
         public IrDate Start { get; }
         public IrDate End { get; }
@@ -109,7 +117,7 @@ namespace Schyntax.Internals
         public int Interval { get; }
         public bool HasInterval { get; }
 
-        internal IrDateRange(IrDate start, IrDate? end, int interval, bool isSplit)
+        internal IrDateRange(IrDate start, IrDate? end, int interval, bool isSplit, bool isHalfOpen)
         {
             Start = start;
             DatesHaveYear = start.Year != 0;
@@ -117,12 +125,13 @@ namespace Schyntax.Internals
             if (end.HasValue)
             {
                 IsRange = true;
+                IsSplit = isSplit;
+                IsHalfOpen = isHalfOpen;
                 End = end.Value;
             }
 
             Interval = interval;
             HasInterval = interval != 0;
-            IsSplit = isSplit;
         }
     }
 

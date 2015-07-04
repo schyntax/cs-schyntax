@@ -245,6 +245,14 @@ namespace Schyntax
                 return true;
             }
 
+            if (range.IsHalfOpen)
+            {
+                // check if this is the last date in a half-open range
+                var end = range.End;
+                if (end.Day == dayOfMonth && end.Month == month && (!range.DatesHaveYear || end.Year == year))
+                    return false;
+            }
+
             // check if in-between start and end dates.
             if (range.DatesHaveYear)
             {
@@ -356,6 +364,9 @@ namespace Schyntax
             {
                 return value == range.Start;
             }
+
+            if (range.IsHalfOpen && value == range.End)
+                return false;
 
             if (range.IsSplit) // range spans across the max value and loops back around
             {

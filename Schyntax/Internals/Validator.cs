@@ -75,28 +75,7 @@ namespace Schyntax.Internals
                         " use the wildcard operator \"*\" instead of an interval", Input, arg.IntervalTokenIndex);
                 }
 
-                ValueValidator validator;
-                switch (expression.ExpressionType)
-                {
-                    case ExpressionType.Seconds:
-                    case ExpressionType.Minutes:
-                        validator = SecondOrMinute;
-                        break;
-                    case ExpressionType.Hours:
-                        validator = Hour;
-                        break;
-                    case ExpressionType.DaysOfWeek:
-                        validator = DayOfWeek;
-                        break;
-                    case ExpressionType.DaysOfMonth:
-                        validator = DayOfMonth;
-                        break;
-                    case ExpressionType.Dates:
-                        validator = Date;
-                        break;
-                    default:
-                        throw new NotImplementedException("ExpressionType " + expression.ExpressionType + " has not been implemented by the validator.");
-                }
+                var validator = GetValidator(expression.ExpressionType);
 
                 if (arg.IsWildcard)
                 {
@@ -124,13 +103,38 @@ namespace Schyntax.Internals
             }
         }
 
+        private ValueValidator GetValidator(ExpressionType expType)
+        {
+            switch (expType)
+            {
+                case ExpressionType.Seconds:
+                case ExpressionType.Minutes:
+                    return SecondOrMinute;
+                case ExpressionType.Hours:
+                    return Hour;
+                case ExpressionType.DaysOfWeek:
+                    return DayOfWeek;
+                case ExpressionType.DaysOfMonth:
+                    return DayOfMonth;
+                case ExpressionType.Dates:
+                    return Date;
+                default:
+                    throw new NotImplementedException("ExpressionType " + expType + " has not been implemented by the validator.");
+            }
+        }
+
         private delegate void ValueValidator(ExpressionType expType, ValueNode value);
 
         private void Range(ExpressionType expType, RangeNode range, ValueValidator validator)
         {
             validator(expType, range.Start);
             if (range.End != null)
+            {
                 validator(expType, range.End);
+
+                if (range.IsHalfOpen && ValuesAreEqual(expType, range.Start, range.End))
+                    throw new SchyntaxParseException("Start and end values of a half-open range cannot be equal.", Input, range.Start.Index);
+            }
 
             if (expType == ExpressionType.Dates && range.End != null)
             {
@@ -205,6 +209,29 @@ namespace Schyntax.Internals
             }
 
             return ival;
+        }
+
+        private bool ValuesAreEqual(ExpressionType expType, ValueNode a, ValueNode b)
+        {
+            if (expType == ExpressionType.Dates)
+            {
+                var ad = (DateValueNode)a;
+                var bd = (DateValueNode)b;
+
+                if (ad.Day != bd.Day || ad.Month != bd.Month)
+                    return false;
+
+                if (ad.Year.HasValue && ad.Year != bd.Year)
+                    return false;
+
+                return true;
+            }
+
+            // integer values
+            var ai = ((IntegerValueNode)a).Value;
+            var bi = ((IntegerValueNode)b).Value;
+
+            return ai == bi;
         }
 
         // returns true if the start date is before or equal to the end date

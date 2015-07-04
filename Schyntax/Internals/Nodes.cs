@@ -94,6 +94,7 @@ namespace Schyntax.Internals
     {
         public ValueNode Start { get; internal set; }
         public ValueNode End { get; internal set; }
+        public bool IsHalfOpen { get; internal set; }
     }
 
     public abstract class ValueNode : Node
