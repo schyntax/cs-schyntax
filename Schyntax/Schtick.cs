@@ -43,7 +43,7 @@ namespace Schyntax
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            return AddTask(name, new Schedule(schedule), callback, null, autoRun, lastKnownRun, window);
+            return AddTaskInternal(name, new Schedule(schedule), callback, null, autoRun, lastKnownRun, window);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Schyntax
             if (asyncCallback == null)
                 throw new ArgumentNullException(nameof(asyncCallback));
 
-            return AddTask(name, new Schedule(schedule), null, asyncCallback, autoRun, lastKnownRun, window);
+            return AddTaskInternal(name, new Schedule(schedule), null, asyncCallback, autoRun, lastKnownRun, window);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Schyntax
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            return AddTask(name, schedule, callback, null, autoRun, lastKnownRun, window);
+            return AddTaskInternal(name, schedule, callback, null, autoRun, lastKnownRun, window);
         }
 
 
@@ -125,10 +125,10 @@ namespace Schyntax
             if (asyncCallback == null)
                 throw new ArgumentNullException(nameof(asyncCallback));
 
-            return AddTask(name, schedule, null, asyncCallback, autoRun, lastKnownRun, window);
+            return AddTaskInternal(name, schedule, null, asyncCallback, autoRun, lastKnownRun, window);
         }
 
-        private ScheduledTask AddTask(
+        private ScheduledTask AddTaskInternal(
             string name,
             Schedule schedule,
             ScheduledTaskCallback callback,
@@ -375,7 +375,7 @@ namespace Schyntax
                             if (Callback != null)
                                 Callback(this, eventTime);
                             else
-                                await AsyncCallback(this, eventTime);
+                                await AsyncCallback(this, eventTime).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
