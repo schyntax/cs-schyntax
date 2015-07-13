@@ -43,7 +43,7 @@ namespace Schyntax
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            return AddTaskInternal(name, new Schedule(schedule), callback, null, autoRun, lastKnownRun, window);
+            return AddTaskImpl(name, new Schedule(schedule), callback, null, autoRun, lastKnownRun, window);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Schyntax
         /// The period of time after an event should have run where it would still be appropriate to run it.
         /// See Task Windows documentation for more details.
         /// </param>
-        public ScheduledTask AddTask(
+        public ScheduledTask AddAsyncTask(
             string name,
             string schedule,
             ScheduledTaskAsyncCallback asyncCallback,
@@ -72,7 +72,7 @@ namespace Schyntax
             if (asyncCallback == null)
                 throw new ArgumentNullException(nameof(asyncCallback));
 
-            return AddTaskInternal(name, new Schedule(schedule), null, asyncCallback, autoRun, lastKnownRun, window);
+            return AddTaskImpl(name, new Schedule(schedule), null, asyncCallback, autoRun, lastKnownRun, window);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Schyntax
             if (callback == null)
                 throw new ArgumentNullException(nameof(callback));
 
-            return AddTaskInternal(name, schedule, callback, null, autoRun, lastKnownRun, window);
+            return AddTaskImpl(name, schedule, callback, null, autoRun, lastKnownRun, window);
         }
 
 
@@ -114,7 +114,7 @@ namespace Schyntax
         /// The period of time after an event should have run where it would still be appropriate to run it.
         /// See Task Windows documentation for more details.
         /// </param>
-        public ScheduledTask AddTask(
+        public ScheduledTask AddAsyncTask(
             string name,
             Schedule schedule,
             ScheduledTaskAsyncCallback asyncCallback,
@@ -125,10 +125,10 @@ namespace Schyntax
             if (asyncCallback == null)
                 throw new ArgumentNullException(nameof(asyncCallback));
 
-            return AddTaskInternal(name, schedule, null, asyncCallback, autoRun, lastKnownRun, window);
+            return AddTaskImpl(name, schedule, null, asyncCallback, autoRun, lastKnownRun, window);
         }
 
-        private ScheduledTask AddTaskInternal(
+        private ScheduledTask AddTaskImpl(
             string name,
             Schedule schedule,
             ScheduledTaskCallback callback,
