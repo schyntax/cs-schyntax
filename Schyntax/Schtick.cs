@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Schyntax
 {
     public delegate void ScheduledTaskCallback(ScheduledTask task, DateTime timeIntendedToRun);
+    public delegate Task ScheduledTaskAsyncCallback(ScheduledTask task, DateTime timeIntendedToRun);
 
     public class Schtick
     {
@@ -28,7 +29,6 @@ namespace Schyntax
         /// The period of time after an event should have run where it would still be appropriate to run it.
         /// See Task Windows documentation for more details.
         /// </param>
-        /// <returns></returns>
         public ScheduledTask AddTask(
             string name,
             string schedule,
@@ -40,9 +40,53 @@ namespace Schyntax
             if (schedule == null)
                 throw new ArgumentNullException(nameof(schedule));
 
-            return AddTask(name, new Schedule(schedule), callback, autoRun, lastKnownRun, window);
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+
+            return AddTask(name, new Schedule(schedule), callback, null, autoRun, lastKnownRun, window);
         }
 
+        /// <summary>
+        /// Adds a scheduled task to this instance of Schtick.
+        /// </summary>
+        /// <param name="name">A unique name for this task. If null, a guid will be used.</param>
+        /// <param name="schedule">A Schyntax schedule string.</param>
+        /// <param name="asyncCallback">Function which will be called each time the task is supposed to run.</param>
+        /// <param name="autoRun">If true, Start() will be called on the task automatically.</param>
+        /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
+        /// <param name="window">
+        /// The period of time after an event should have run where it would still be appropriate to run it.
+        /// See Task Windows documentation for more details.
+        /// </param>
+        public ScheduledTask AddTask(
+            string name,
+            string schedule,
+            ScheduledTaskAsyncCallback asyncCallback,
+            bool autoRun = true,
+            DateTime lastKnownRun = default(DateTime),
+            TimeSpan window = default(TimeSpan))
+        {
+            if (schedule == null)
+                throw new ArgumentNullException(nameof(schedule));
+
+            if (asyncCallback == null)
+                throw new ArgumentNullException(nameof(asyncCallback));
+
+            return AddTask(name, new Schedule(schedule), null, asyncCallback, autoRun, lastKnownRun, window);
+        }
+
+        /// <summary>
+        /// Adds a scheduled task to this instance of Schtick.
+        /// </summary>
+        /// <param name="name">A unique name for this task. If null, a guid will be used.</param>
+        /// <param name="schedule">A Schyntax Schedule object.</param>
+        /// <param name="callback">Function which will be called each time the task is supposed to run.</param>
+        /// <param name="autoRun">If true, Start() will be called on the task automatically.</param>
+        /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
+        /// <param name="window">
+        /// The period of time after an event should have run where it would still be appropriate to run it.
+        /// See Task Windows documentation for more details.
+        /// </param>
         public ScheduledTask AddTask(
             string name,
             Schedule schedule,
@@ -51,6 +95,51 @@ namespace Schyntax
             DateTime lastKnownRun = default(DateTime),
             TimeSpan window = default(TimeSpan))
         {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+
+            return AddTask(name, schedule, callback, null, autoRun, lastKnownRun, window);
+        }
+
+
+        /// <summary>
+        /// Adds a scheduled task to this instance of Schtick.
+        /// </summary>
+        /// <param name="name">A unique name for this task. If null, a guid will be used.</param>
+        /// <param name="schedule">A Schyntax Schedule object.</param>
+        /// <param name="asyncCallback">Function which will be called each time the task is supposed to run.</param>
+        /// <param name="autoRun">If true, Start() will be called on the task automatically.</param>
+        /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
+        /// <param name="window">
+        /// The period of time after an event should have run where it would still be appropriate to run it.
+        /// See Task Windows documentation for more details.
+        /// </param>
+        public ScheduledTask AddTask(
+            string name,
+            Schedule schedule,
+            ScheduledTaskAsyncCallback asyncCallback,
+            bool autoRun = true,
+            DateTime lastKnownRun = default(DateTime),
+            TimeSpan window = default(TimeSpan))
+        {
+            if (asyncCallback == null)
+                throw new ArgumentNullException(nameof(asyncCallback));
+
+            return AddTask(name, schedule, null, asyncCallback, autoRun, lastKnownRun, window);
+        }
+
+        private ScheduledTask AddTask(
+            string name,
+            Schedule schedule,
+            ScheduledTaskCallback callback,
+            ScheduledTaskAsyncCallback asyncCallback,
+            bool autoRun,
+            DateTime lastKnownRun,
+            TimeSpan window)
+        {
+            if (schedule == null)
+                throw new ArgumentNullException(nameof(schedule));
+
             if (name == null)
                 name = Guid.NewGuid().ToString();
 
@@ -63,7 +152,7 @@ namespace Schyntax
                 if (_tasks.ContainsKey(name))
                     throw new Exception($"A scheduled task named \"{name}\" already exists.");
 
-                task = new ScheduledTask(name, schedule, callback)
+                task = new ScheduledTask(name, schedule, callback, asyncCallback)
                 {
                     Window = window,
                     IsAttached = true,
@@ -155,6 +244,7 @@ namespace Schyntax
         public string Name { get; }
         public Schedule Schedule { get; private set; }
         public ScheduledTaskCallback Callback { get; }
+        public ScheduledTaskAsyncCallback AsyncCallback { get; }
         public bool IsScheduleRunning { get; internal set; }
         public bool IsCallbackExecuting => _execLocked == 1;
         public bool IsAttached { get; internal set; }
@@ -164,11 +254,16 @@ namespace Schyntax
 
         public event Action<ScheduledTask, Exception> OnException;
 
-        internal ScheduledTask(string name, Schedule schedule, ScheduledTaskCallback callback)
+        internal ScheduledTask(string name, Schedule schedule, ScheduledTaskCallback callback, ScheduledTaskAsyncCallback asyncCallback)
         {
             Name = name;
             Schedule = schedule;
+
+            if ((callback == null) == (asyncCallback == null))
+                throw new Exception("callback or asyncCallback must be specified, but not both.");
+
             Callback = callback;
+            AsyncCallback = asyncCallback;
         }
 
         public void StartSchedule(DateTime lastKnownRun = default(DateTime))
@@ -277,7 +372,10 @@ namespace Schyntax
                         PrevEvent = eventTime;
                         try
                         {
-                            Callback(this, eventTime);
+                            if (Callback != null)
+                                Callback(this, eventTime);
+                            else
+                                await AsyncCallback(this, eventTime);
                         }
                         catch (Exception ex)
                         {
