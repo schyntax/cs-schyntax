@@ -180,6 +180,23 @@ namespace Schyntax
             return _tasks.TryGetValue(name, out task);
         }
 
+        public ScheduledTask[] GetAllTasks()
+        {
+            lock (_lockTasks)
+            {
+                // could be one line of linq, but eh, this is cheaper
+                var tasks = new ScheduledTask[_tasks.Count];
+                var i = 0;
+                foreach(var t in _tasks)
+                {
+                    tasks[i] = t.Value;
+                    i++;
+                }
+
+                return tasks;
+            }
+        }
+
         public bool RemoveTask(string name)
         {
             lock (_lockTasks)
@@ -206,7 +223,7 @@ namespace Schyntax
             lock (_lockTasks)
             {
                 IsShuttingDown = true;
-                tasks = _tasks.Select(kvp => kvp.Value).ToArray();
+                tasks = GetAllTasks();
             }
             
             foreach (var t in tasks)
