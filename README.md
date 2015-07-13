@@ -16,7 +16,7 @@ var schtick = new Schtick();
 schtick.OnTaskException += (task, exception) => LogException(ex);
 
 // add a task which will call DoSomeTask every hour at 15 minutes past the hour
-schtick.AddTask("hour(*) min(15)", (task, timeIntendedToRun) => DoSomeTask());
+schtick.AddTask("unique-task-name", "hour(*) min(15)", (task, timeIntendedToRun) => DoSomeTask());
 ```
 
 > For complete documentation of schedule format language itself, see the [Schyntax](https://github.com/schyntax/schyntax) project.

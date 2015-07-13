@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Schyntax
 {
@@ -9,239 +11,318 @@ namespace Schyntax
     public class Schtick
     {
         private readonly object _lockTasks = new object();
-        private readonly List<ScheduledTask> _tasks = new List<ScheduledTask>();
-
-        public IReadOnlyList<ScheduledTask> Tasks => _tasks.AsReadOnly();
+        private readonly Dictionary<string, ScheduledTask> _tasks = new Dictionary<string, ScheduledTask>();
+        public bool IsShuttingDown { get; private set; }
 
         public event Action<ScheduledTask, Exception> OnTaskException;
 
         /// <summary>
         /// Adds a scheduled task to this instance of Schtick.
         /// </summary>
-        /// <param name="schedule">A string representing a valid schyntax schedule.</param>
+        /// <param name="name">A unique name for this task. If null, a guid will be used.</param>
+        /// <param name="schedule">A Schyntax schedule string.</param>
         /// <param name="callback">Function which will be called each time the task is supposed to run.</param>
         /// <param name="autoRun">If true, Start() will be called on the task automatically.</param>
-        /// <param name="name">Optional name for the task. This is not used by Schtick, but may be useful for application code.</param>
         /// <param name="lastKnownRun">The last Date when the task is known to have run. Used for Task Windows.</param>
         /// <param name="window">
         /// The period of time after an event should have run where it would still be appropriate to run it.
         /// See Task Windows documentation for more details.
         /// </param>
-        /// <param name="skipIfSlowCallback">
-        /// If true, and a callback does not complete before the next time it is supposed to be called, then it won't be called until the next
-        /// interval after it has completed. If false, then the callback will always be called once per interval, even though the number of calls
-        /// may start to get backed up.
-        /// </param>
         /// <returns></returns>
         public ScheduledTask AddTask(
-            string schedule, 
-            ScheduledTaskCallback callback, 
-            bool autoRun = true, 
-            string name = null, 
-            DateTime lastKnownRun = default(DateTime), 
-            TimeSpan window = default(TimeSpan),
-            bool skipIfSlowCallback = true)
+            string name,
+            string schedule,
+            ScheduledTaskCallback callback,
+            bool autoRun = true,
+            DateTime lastKnownRun = default(DateTime),
+            TimeSpan window = default(TimeSpan))
         {
-            var task = new ScheduledTask(this, new Schedule(schedule), window, callback)
-            {
-                Name = name,
-                SkipIfSlowCallback = skipIfSlowCallback
-            };
+            if (schedule == null)
+                throw new ArgumentNullException(nameof(schedule));
 
+            return AddTask(name, new Schedule(schedule), callback, autoRun, lastKnownRun, window);
+        }
+
+        public ScheduledTask AddTask(
+            string name,
+            Schedule schedule,
+            ScheduledTaskCallback callback,
+            bool autoRun = true,
+            DateTime lastKnownRun = default(DateTime),
+            TimeSpan window = default(TimeSpan))
+        {
+            if (name == null)
+                name = Guid.NewGuid().ToString();
+
+            ScheduledTask task;
             lock (_lockTasks)
             {
-                _tasks.Add(task);
+                if (IsShuttingDown)
+                    throw new Exception("Cannot add a task to Schtick after Shutdown() has been called.");
+
+                if (_tasks.ContainsKey(name))
+                    throw new Exception($"A scheduled task named \"{name}\" already exists.");
+
+                task = new ScheduledTask(name, schedule, callback)
+                {
+                    Window = window,
+                    IsAttached = true,
+                };
+
+                _tasks.Add(name, task);
             }
 
+            task.OnException += TaskOnOnException;
+
             if (autoRun)
-                task.Start(lastKnownRun);
-            
+                task.StartSchedule(lastKnownRun);
+
             return task;
         }
 
-        /// <summary>
-        /// If the task in contained in this instance of Schtick, then the task is removed from the list and stopped (if running).
-        /// Attempting to re-start the task after removing it will throw an exception.
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns>True if the task was removed and stopped, otherwise false.</returns>
-        public bool RemoveTask(ScheduledTask task)
+        private void TaskOnOnException(ScheduledTask task, Exception ex)
+        {
+            var ev = OnTaskException;
+            ev?.Invoke(task, ex);
+        }
+
+        public bool TryGetTask(string name, out ScheduledTask task)
+        {
+            return _tasks.TryGetValue(name, out task);
+        }
+
+        public bool RemoveTask(string name)
         {
             lock (_lockTasks)
             {
-                var found = false;
-                for (var i = 0; i < _tasks.Count; i++)
+                if (IsShuttingDown)
+                    throw new Exception("Cannot remove a task from Schtick after Shutdown() has been called.");
+
+                ScheduledTask task;
+                if (!_tasks.TryGetValue(name, out task))
+                    return false;
+
+                if (task.IsScheduleRunning)
+                    throw new Exception($"Cannot remove task \"{name}\". It is still running.");
+
+                task.IsAttached = false;
+                _tasks.Remove(name);
+                return true;
+            }
+        }
+
+        public async Task Shutdown()
+        {
+            ScheduledTask[] tasks;
+            lock (_lockTasks)
+            {
+                IsShuttingDown = true;
+                tasks = _tasks.Select(kvp => kvp.Value).ToArray();
+            }
+            
+            foreach (var t in tasks)
+            {
+                t.IsAttached = false; // prevent anyone from calling start on the task again
+                t.StopSchedule();
+            }
+
+            while (true)
+            {
+                var allStopped = true;
+                foreach (var t in tasks)
                 {
-                    if (_tasks[i] == task)
+                    if (t.IsCallbackExecuting)
                     {
-                        _tasks.RemoveAt(i);
-                        found = true;
+                        allStopped = false;
+                        break;
                     }
                 }
 
-                if (!found)
-                    return false;
+                if (allStopped)
+                    return;
+
+                await Task.Delay(10).ConfigureAwait(false); // wait 10 milliseconds, then check again
             }
-
-            task.IsAttached = false;
-            task.Stop();
-            return true;
-        }
-
-        internal void InvokeExceptionEvent(ScheduledTask task, Exception ex)
-        {
-            OnTaskException?.Invoke(task, ex);
         }
     }
 
     public class ScheduledTask
     {
-        private struct ScheduleThreadData
-        {
-            public int ThreadVersion;
-            public DateTime FirstEvent;
-        }
+        private readonly object _scheduleLock = new object();
+        private int _runId = 0;
+        private int _execLocked = 0;
 
-        private readonly object _lockStartStop = new object();
-        private int _threadVersion = 0;
-
-        public Schtick Schtick { get; }
-        public bool IsAttached { get; internal set; }
-        public string Name { get; set; }
-        public bool IsRunning { get; private set; }
-        public Schedule Schedule { get; }
+        public string Name { get; }
+        public Schedule Schedule { get; private set; }
         public ScheduledTaskCallback Callback { get; }
-        public DateTime NextTime { get; private set; }
-        public TimeSpan Window { get; }
-        public bool SkipIfSlowCallback { get; set; }
+        public bool IsScheduleRunning { get; internal set; }
+        public bool IsCallbackExecuting => _execLocked == 1;
+        public bool IsAttached { get; internal set; }
+        public TimeSpan Window { get; set; }
+        public DateTime NextEvent { get; private set; }
+        public DateTime PrevEvent { get; private set; }
 
-        internal ScheduledTask(Schtick schtick, Schedule schedule, TimeSpan window, ScheduledTaskCallback callback)
+        public event Action<ScheduledTask, Exception> OnException;
+
+        internal ScheduledTask(string name, Schedule schedule, ScheduledTaskCallback callback)
         {
-            Schtick = schtick;
+            Name = name;
             Schedule = schedule;
-            Window = window;
             Callback = callback;
-            IsAttached = true;
         }
 
-        public void Start(DateTime lastKnownRun = default(DateTime))
+        public void StartSchedule(DateTime lastKnownRun = default(DateTime))
         {
-            if (!IsAttached)
-                throw new InvalidOperationException("Cannot start task which is not attached to a Schtick instance.");
-
-            lock (_lockStartStop)
+            lock (_scheduleLock)
             {
-                if (IsRunning)
+                if (!IsAttached)
+                    throw new InvalidOperationException("Cannot start task which is not attached to a Schtick instance.");
+
+                if (IsScheduleRunning)
                     return;
 
-                _threadVersion++;
-                IsRunning = true;
-
-                var set = false;
-                var data = new ScheduleThreadData { ThreadVersion = _threadVersion };
-                if (Window > TimeSpan.Zero && lastKnownRun != default(DateTime))
+                var firstEvent = default(DateTime);
+                var firstEventSet = false;
+                var window = Window;
+                if (window > TimeSpan.Zero && lastKnownRun != default(DateTime))
                 {
                     // check if we actually want to run the first event right away
                     var prev = Schedule.Previous();
                     lastKnownRun = lastKnownRun.AddSeconds(1); // add a second for good measure
-                    if (prev > lastKnownRun && prev > (DateTime.UtcNow - Window))
+                    if (prev > lastKnownRun && prev > (DateTime.UtcNow - window))
                     {
-                        data.FirstEvent = prev;
-                        set = true;
+                        firstEvent = prev;
+                        firstEventSet = true;
                     }
                 }
 
-                if (!set)
-                    data.FirstEvent = Schedule.Next();
+                if (!firstEventSet)
+                    firstEvent = Schedule.Next();
 
-                NextTime = data.FirstEvent;
+                while (firstEvent <= PrevEvent)
+                {
+                    // we don't want to run the same event twice
+                    firstEvent = Schedule.Next(firstEvent);
+                }
 
-                // start schedule thread
-                var thread = new Thread(RunSchedule);
-                thread.IsBackground = true;
-                thread.Start(data);
+                NextEvent = firstEvent;
+                Run(_runId).ContinueWith(task => { });
+
+                IsScheduleRunning = true;
             }
         }
-
-        public void Stop()
+        
+        public void StopSchedule()
         {
-            lock (_lockStartStop)
+            lock (_scheduleLock)
             {
-                if (!IsRunning)
+                if (!IsScheduleRunning)
                     return;
 
-                IsRunning = false;
+                _runId++;
+                IsScheduleRunning = false;
             }
         }
 
-        private void RunSchedule(object o)
+        public void UpdateSchedule(string schedule)
         {
-            const int MAXIMUM_WAIT = 30000;
+            UpdateSchedule(new Schedule(schedule));
+        }
 
-            var data = (ScheduleThreadData)o;
+        public void UpdateSchedule(Schedule schedule)
+        {
+            if (schedule == null)
+                throw new ArgumentNullException(nameof(schedule));
 
-            var nextTime = data.FirstEvent;
-            var runOnNext = false;
-            var thread = Thread.CurrentThread;
-
-            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
-            while (IsRunning && data.ThreadVersion == _threadVersion)
+            lock (_scheduleLock)
             {
-                if (runOnNext || DateTime.UtcNow >= nextTime)
+                var wasRunning = IsScheduleRunning;
+                if (wasRunning)
+                    StopSchedule();
+
+                Schedule = schedule;
+
+                if (wasRunning)
+                    StartSchedule();
+            }
+        }
+
+        private async Task Run(int runId)
+        {
+            while (true)
+            {
+                if (runId != _runId)
+                    return;
+
+                var eventTime = NextEvent;
+                var delay = eventTime - DateTime.UtcNow;
+
+                if (delay > TimeSpan.Zero)
+                    await Task.Delay(delay).ConfigureAwait(false);
+
+                var execLockTaken = false;
+                try
                 {
-                    runOnNext = false;
+                    lock (_scheduleLock)
+                    {
+                        if (runId != _runId)
+                            return;
 
-                    try
-                    {
-                        // promote to a foreground thread so that it's less likely to get killed while the task is running
-                        thread.IsBackground = false;
-                        Callback(this, nextTime);
-                    }
-                    catch (Exception ex)
-                    {
-                        // invoke the exception handler on a separate thread
-                        var exThread = new Thread(InvokeExceptionEvent);
-                        exThread.Start(ex);
+                        // take execution lock
+                        execLockTaken = Interlocked.CompareExchange(ref _execLocked, 1, 0) == 0;
                     }
 
-                    // go back to being a background thread so that we don't keep the application alive for no reason.
-                    thread.IsBackground = true;
-
-                    try
+                    if (execLockTaken) // if lock wasn't taken, then we're still executing from a previous event, which means we skip this one.
                     {
-                        nextTime = Schedule.Next(nextTime);
-                        if (SkipIfSlowCallback && nextTime < DateTime.UtcNow)
+                        PrevEvent = eventTime;
+                        try
                         {
-                            nextTime = Schedule.Next(DateTime.UtcNow);
+                            Callback(this, eventTime);
+                        }
+                        catch (Exception ex)
+                        {
+                            RaiseException(ex);
+                        }
+
+                        // figure out the next time to run the schedule
+                        lock (_scheduleLock)
+                        {
+                            if (runId != _runId)
+                                return;
+
+                            try
+                            {
+                                var next = Schedule.Next();
+                                if (next <= eventTime)
+                                    next = Schedule.Next(eventTime);
+
+                                NextEvent = next;
+                            }
+                            catch(Exception ex)
+                            {
+                                _runId++;
+                                RaiseException(new ScheduleCrashException("Schtick Schedule has been terminated because the next valid time could not be found.", this, ex));
+                                return;
+                            }
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        IsRunning = false;
-                        InvokeExceptionEvent(new ScheduleCrashException("Schtick Schedule has been terminated because the next valid time could not be found.", this, ex));
-                        return;
-                    }
                 }
-
-                NextTime = nextTime;
-
-                // get how long we would need to wait for the next 
-                var ms = (int)(nextTime - DateTime.UtcNow).TotalMilliseconds;
-                if (ms < MAXIMUM_WAIT)
+                finally
                 {
-                    runOnNext = true;
-                    Thread.Sleep(Math.Max(ms, 0));
-                }
-                else
-                {
-                    Thread.Sleep(MAXIMUM_WAIT);
+                    if (execLockTaken)
+                        _execLocked = 0; // release exec lock
                 }
             }
         }
 
-        private void InvokeExceptionEvent(object o)
+        private void RaiseException(Exception ex)
         {
-            Schtick.InvokeExceptionEvent(this, (Exception)o);
+            Task.Run(() =>
+            {
+                var ev = OnException;
+                ev?.Invoke(this, ex);
+
+            }).ContinueWith(task => { });
         }
     }
 }

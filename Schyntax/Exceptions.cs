@@ -63,16 +63,4 @@ namespace Schyntax
             Data["Schedule"] = task.Schedule.OriginalText;
         }
     }
-
-    public sealed class ScheduleCrashException2 : SchyntaxException
-    {
-        public ScheduledTask2 Task { get; }
-
-        internal ScheduleCrashException2(string message, ScheduledTask2 task, Exception innerException) : base(message, innerException)
-        {
-            Task = task;
-            Data["TaskName"] = task.Name;
-            Data["Schedule"] = task.Schedule.OriginalText;
-        }
-    }
 }
