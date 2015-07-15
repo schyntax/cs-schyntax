@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -318,7 +317,8 @@ namespace Schyntax
                 }
 
                 NextEvent = firstEvent;
-                Run(_runId).ContinueWith(task => { });
+                var runId = _runId;
+                Task.Run(() => Run(runId));
 
                 IsScheduleRunning = true;
             }
