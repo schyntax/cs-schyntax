@@ -6,7 +6,7 @@ namespace Schyntax.Internals
     {
         // literal terminals
         public static Terminal RangeInclusive { get; } = new Terminal(TokenType.RangeInclusive, "..");
-        public static Terminal RangeHalfOpen { get; } = new Terminal(TokenType.RangeHalfOpen, "...");
+        public static Terminal RangeHalfOpen { get; } = new Terminal(TokenType.RangeHalfOpen, "..<");
         public static Terminal Interval { get; } = new Terminal(TokenType.Interval, "%");
         public static Terminal Not { get; } = new Terminal(TokenType.Not, "!");
         public static Terminal OpenParen { get; } = new Terminal(TokenType.OpenParen, "(");
