@@ -11,6 +11,6 @@
     <description>$description$</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2015</copyright>
-    <tags>Schedule Scheduler Task Runner</tags>
+    <tags>Schedule DSL</tags>
   </metadata>
 </package>

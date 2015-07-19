@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		LICENSE.MIT = LICENSE.MIT
 		README.md = README.md
-		Schyntax\Schyntax.nuspec = Schyntax\Schyntax.nuspec
 		Scripts\SetNugetVersion.ps1 = Scripts\SetNugetVersion.ps1
 	EndProjectSection
 EndProject
