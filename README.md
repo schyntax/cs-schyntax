@@ -3,36 +3,34 @@
 [![NuGet version](https://badge.fury.io/nu/Schyntax.svg)](http://badge.fury.io/nu/Schyntax)
 [![Build status](https://ci.appveyor.com/api/projects/status/y1ij5ty5hv2gx1qd/branch/master?svg=true)](https://ci.appveyor.com/project/bretcope/cs-schyntax/branch/master)
 
-[Schyntax](https://github.com/schyntax/schyntax) is a domain-specific language for defining event schedules in a terse, but readable, format. For example, if you want something to run every five minutes during work hours on weekdays, you could write `days(mon..fri) hours(9..17) min(*%5)`. This project is the reference implementation of Schyntax.
+[Schyntax](https://github.com/schyntax/schyntax) is a domain-specific language for defining event schedules in a terse, but readable, format. For example, if you want something to run every five minutes during work hours on weekdays, you could write `days(mon..fri) hours(9..<17) min(*%5)`. This project is the reference implementation of Schyntax.
 
 ## Usage
 
-The easiest way to setup scheduled tasks is with the `Schtick` class. Best practice is to make a singleton instance, though there's nothing harmful about creating more than one.
+> This library is __NOT__ a scheduled task runner. Most likely, you'll want to use [Schtick](https://github.com/schyntax/cs-schtick), which is a scheduled task runner built on top of Schyntax, instead of using this library directly.
+
+Schyntax exposes the `Schedule` class.
 
 ```csharp
-var schtick = new Schtick();
+using Schyntax;
 
-// setup an exception handler so we know when tasks blow up
-schtick.OnTaskException += (task, exception) => LogException(ex);
-
-// add a task which will call DoSomeTask every hour at 15 minutes past the hour
-schtick.AddTask("unique-task-name", "hour(*) min(15)", (task, timeIntendedToRun) => DoSomeTask());
+var sch = new Schedule("min(*%2)");
 ```
 
-> For complete documentation of schedule format language itself, see the [Schyntax](https://github.com/schyntax/schyntax) project.
+### Schedule#Next
 
-`AddTask` has several optional arguments which are documented in [Schtick.cs](https://github.com/schyntax/cs-schyntax/blob/master/Schyntax/Schtick.cs) and will show up in intellisense.
+Accepts an optional `after` argument in the form of a `DateTime`. If no argument is provided, the current time is used.
 
-If you don't need an actual task runner, you can also use the `Schedule` class directly.
+Returns a `DateTime` object representing the next timestamp which matches the scheduling criteria. The date will always be greater than, never equal to, `after`. If no timestamp could be found which matches the scheduling criteria, a `ValidTimeNotFoundException` error is thrown, which generally indicates conflicting scheduling criteria (explicitly including and excluding the same day or time).
 
 ```csharp
-var sch = new Schedule("hours(16) days(mon..fri)");
+var nextEventTime = sch.Next();
+```
 
-// get the next two times applicable to the schedule
-var next1 = sch.Next();
-var next2 = sch.Next(next1);
+### Schedule#Previous
 
-// get the previous two times applicable to the schedule
-var prev1 = sch.Previous();
-var prev2 = sch.Previous(prev1);
+Same as `Previous()` accept that its return value will be less than or equal to the current time or optional `atOrBefore` argument. This means that if you want to find the last n-previous events, you should subtract at least a millisecond from the result before passing it back to the function.
+
+```csharp
+var prevEventTime = sch.Previous(); 
 ```
