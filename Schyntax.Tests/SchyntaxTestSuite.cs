@@ -75,7 +75,7 @@ namespace Schyntax.Tests
         public IEnumerable Checks => Suites[SuiteName].Checks.Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next });
 
         [TestCaseSource("Checks")]
-        public void Check(string format, DateTime start, DateTime prev, DateTime next)
+        public void Check(string format, DateTimeOffset start, DateTimeOffset prev, DateTimeOffset next)
         {
             var sch = new Schedule(format);
 
@@ -99,12 +99,12 @@ namespace Schyntax.Tests
         public string Format { get; set; }
 
         [JilDirective("date")]
-        public DateTime Date { get; set; }
+        public DateTimeOffset Date { get; set; }
 
         [JilDirective("prev")]
-        public DateTime Prev { get; set; }
+        public DateTimeOffset Prev { get; set; }
 
         [JilDirective("next")]
-        public DateTime Next { get; set; }
+        public DateTimeOffset Next { get; set; }
     }
 }

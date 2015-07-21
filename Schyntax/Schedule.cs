@@ -22,22 +22,22 @@ namespace Schyntax
             _ir = IrBuilder.CompileAst(ast);
         }
 
-        public DateTime Next()
+        public DateTimeOffset Next()
         {
-            return Next(DateTime.UtcNow);
+            return Next(DateTimeOffset.UtcNow);
         }
 
-        public DateTime Next(DateTime after)
+        public DateTimeOffset Next(DateTimeOffset after)
         {
             return GetEvent(after, SearchMode.After);
         }
 
-        public DateTime Previous()
+        public DateTimeOffset Previous()
         {
-            return Previous(DateTime.UtcNow);
+            return Previous(DateTimeOffset.UtcNow);
         }
 
-        public DateTime Previous(DateTime atOrBefore)
+        public DateTimeOffset Previous(DateTimeOffset atOrBefore)
         {
             return GetEvent(atOrBefore, SearchMode.AtOrBefore);
         }
@@ -48,15 +48,15 @@ namespace Schyntax
             After
         }
 
-        private DateTime GetEvent(DateTime start, SearchMode mode)
+        private DateTimeOffset GetEvent(DateTimeOffset start, SearchMode mode)
         {
             start = start.ToUniversalTime();
             var found = false;
-            var result = default(DateTime);
+            var result = default(DateTimeOffset);
 
             foreach (var group in _ir.Groups)
             {
-                DateTime e;
+                DateTimeOffset e;
                 if (TryGetGroupEvent(group, start, mode, out e))
                 {
                     if (!found 
@@ -77,7 +77,7 @@ namespace Schyntax
 
         // yes yes, I know it's complicated, but settle down ReSharper
         // ReSharper disable once FunctionComplexityOverflow
-        private static bool TryGetGroupEvent(IrGroup group, DateTime start, SearchMode mode, out DateTime result)
+        private static bool TryGetGroupEvent(IrGroup group, DateTimeOffset start, SearchMode mode, out DateTimeOffset result)
         {
             var after = mode == SearchMode.After;
             var inc = after ? 1 : -1; // used for incrementing values up or down depending on the direction we're searching
@@ -89,7 +89,7 @@ namespace Schyntax
             // todo: make the length of the search configurable
             for (var d = 0; d < 367; d++)
             {
-                DateTime date;
+                DateTimeOffset date;
                 int hour, minute, second;
                 if (d == 0)
                 {
@@ -205,7 +205,7 @@ namespace Schyntax
                                 continue;
 
                             // we've found our event
-                            result = new DateTime(year, month, dayOfMonth, hour, minute, second, DateTimeKind.Utc);
+                            result = new DateTimeOffset(year, month, dayOfMonth, hour, minute, second, TimeSpan.Zero);
                             return true;
                         }
                     }
@@ -215,7 +215,7 @@ namespace Schyntax
             }
 
             // we didn't find an applicable date
-            result = default(DateTime);
+            result = default(DateTimeOffset);
             return false;
         }
 
@@ -322,8 +322,8 @@ namespace Schyntax
                 startDay = 28;
             }
 
-            var start = new DateTime(startYear, range.Start.Month, startDay, 0, 0, 0, DateTimeKind.Utc);
-            var current = new DateTime(year, month, dayOfMonth, 0, 0, 0, DateTimeKind.Utc);
+            var start = new DateTimeOffset(startYear, range.Start.Month, startDay, 0, 0, 0, TimeSpan.Zero);
+            var current = new DateTimeOffset(year, month, dayOfMonth, 0, 0, 0, TimeSpan.Zero);
             var dayCount = Math.Round((current - start).TotalDays);
 
             return (dayCount % range.Interval) == 0;
