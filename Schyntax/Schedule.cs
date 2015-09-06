@@ -113,7 +113,6 @@ namespace Schyntax
                 var month = date.Month;
                 var dayOfWeek = (int)date.DayOfWeek + 1; // DayOfWeek enum is zero-indexed
                 var dayOfMonth = date.Day;
-                var daysInMonth = DateTime.DaysInMonth(year, month);
 
                 // check if today is an applicable date
                 if (group.HasDates)
@@ -235,7 +234,7 @@ namespace Schyntax
             // first, check if this is actually a range
             if (!range.IsRange)
             {
-                // not a range, so just to a straight comparison
+                // not a range, so just do a straight comparison
                 if (range.Start.Month != month || range.Start.Day != dayOfMonth)
                     return false;
 
@@ -324,7 +323,7 @@ namespace Schyntax
 
             var start = new DateTimeOffset(startYear, range.Start.Month, startDay, 0, 0, 0, TimeSpan.Zero);
             var current = new DateTimeOffset(year, month, dayOfMonth, 0, 0, 0, TimeSpan.Zero);
-            var dayCount = Math.Round((current - start).TotalDays);
+            var dayCount = (int)Math.Round((current - start).TotalDays);
 
             return (dayCount % range.Interval) == 0;
         }
@@ -355,10 +354,10 @@ namespace Schyntax
                 );
             }
 
-            return InIntegerRange(range, dayOfMonth, DaysInPreviousMonth(year, month), 1);
+            return InIntegerRange(range, dayOfMonth, DaysInPreviousMonth(year, month));
         }
 
-        private static bool InIntegerRange(IrIntegerRange range, int value, int lengthOfUnit, int min = 0)
+        private static bool InIntegerRange(IrIntegerRange range, int value, int lengthOfUnit)
         {
             if (!range.IsRange)
             {
