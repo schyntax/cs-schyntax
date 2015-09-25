@@ -94,7 +94,7 @@ namespace Schyntax.Internals
             if (IsEndNext)
             {
                 if (_contextStack.Count > 1)
-                    throw new Exception("Lexer reached the end of the input while in a nested context." + SchyntaxException.PLEASE_REPORT_BUG_MSG);
+                    throw new SchyntaxParseException("Unexpected end of input.", Input, _index);
 
                 ConsumeToken(new Token() { Type = TokenType.EndOfInput, Index = _index, RawValue = "", Value = "" });
                 return true;

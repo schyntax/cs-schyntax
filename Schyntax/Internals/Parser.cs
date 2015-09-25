@@ -148,7 +148,12 @@ namespace Schyntax.Internals
                 // positive integer is valid for anything
                 var tok = Advance();
                 val.AddToken(tok);
-                val.Value = int.Parse(tok.Value);
+
+                int ival;
+                if (!int.TryParse(tok.Value, out ival))
+                    throw new SchyntaxParseException("Integer value is too large.", Input, tok.Index);
+
+                val.Value = ival;
             }
             else if (IsNext(TokenType.NegativeInteger))
             {
@@ -163,6 +168,9 @@ namespace Schyntax.Internals
             }
             else if (IsNext(TokenType.DayLiteral))
             {
+                if (expressionType != ExpressionType.DaysOfWeek)
+                    throw new SchyntaxParseException("Unexpected day literal. Day literals are only allowed in daysOfWeek expressions.", Input, Peek().Index);
+
                 var tok = Advance();
                 val.AddToken(tok);
                 val.Value = DayToInteger(tok.Value);

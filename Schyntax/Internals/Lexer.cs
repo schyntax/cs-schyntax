@@ -80,12 +80,11 @@ namespace Schyntax.Internals
 
             if (!ConsumeOptionalTerm(Terms.Wildcard))
             {
-                if (ConsumeNumberDayOrDate(false))
-                {
-                    // might be a range
-                    if (ConsumeOptionalTerm(Terms.RangeHalfOpen) || ConsumeOptionalTerm(Terms.RangeInclusive))
-                        ConsumeNumberDayOrDate(true);
-                }
+                ConsumeNumberDayOrDate();
+
+                // might be a range
+                if (ConsumeOptionalTerm(Terms.RangeHalfOpen) || ConsumeOptionalTerm(Terms.RangeInclusive))
+                    ConsumeNumberDayOrDate();
             }
 
             if (ConsumeOptionalTerm(Terms.Interval))
@@ -97,7 +96,7 @@ namespace Schyntax.Internals
         }
 
         // this lexes a number, day, or date
-        private bool ConsumeNumberDayOrDate(bool required)
+        private void ConsumeNumberDayOrDate()
         {
             if (ConsumeOptionalTerm(Terms.PositiveInteger))
             {
@@ -111,7 +110,7 @@ namespace Schyntax.Internals
                         ConsumeTerm(Terms.PositiveInteger);
                 }
 
-                return true;
+                return;
             }
 
             if (ConsumeOptionalTerm(Terms.NegativeInteger) ||
@@ -123,13 +122,10 @@ namespace Schyntax.Internals
                 ConsumeOptionalTerm(Terms.Friday) ||
                 ConsumeOptionalTerm(Terms.Saturday))
             {
-                return true;
+                return;
             }
-
-            if (required)
-                throw UnexpectedText(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
-
-            return false;
+            
+            throw UnexpectedText(TokenType.PositiveInteger, TokenType.NegativeInteger, TokenType.DayLiteral);
         }
     }
 }
