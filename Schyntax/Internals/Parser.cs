@@ -164,6 +164,11 @@ namespace Schyntax.Internals
 
                 var tok = Advance();
                 val.AddToken(tok);
+
+                int ival;
+                if (!int.TryParse(tok.Value, out ival))
+                    throw new SchyntaxParseException("Integer value is too small.", Input, tok.Index);
+
                 val.Value = int.Parse(tok.Value);
             }
             else if (IsNext(TokenType.DayLiteral))
