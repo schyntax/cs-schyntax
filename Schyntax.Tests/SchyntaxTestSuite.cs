@@ -45,6 +45,24 @@ namespace Schyntax.Tests
         public override string SuiteName => "seconds";
     }
 
+    [TestFixture]
+    public class SyntaxErrors : SchyntaxTestRunner
+    {
+        public override string SuiteName => "syntaxErrors";
+    }
+
+    [TestFixture]
+    public class ArgumentErrors : SchyntaxTestRunner
+    {
+        public override string SuiteName => "argumentErrors";
+    }
+
+    [TestFixture]
+    public class Commas : SchyntaxTestRunner
+    {
+        public override string SuiteName => "commas";
+    }
+
     public abstract class SchyntaxTestRunner
     {
         private static Dictionary<string, SchyntaxSuite> _suites;
