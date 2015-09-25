@@ -11,6 +11,9 @@ namespace Schyntax
 
     public sealed class SchyntaxParseException : SchyntaxException
     {
+        public string Input => (string) Data["Input"];
+        public int Index => (int) Data["Index"];
+
         internal SchyntaxParseException(string message, string input, int index) : base (message + "\n\n" + GetPointerToIndex(input, index))
         {
             Data["Index"] = index;
@@ -31,14 +34,6 @@ namespace Schyntax
 
             sb.Append('^');
             return sb.ToString();
-        }
-    }
-
-    public sealed class InvalidScheduleException : SchyntaxException
-    {
-        internal InvalidScheduleException(string message, string input) : base (message)
-        {
-            Data["Input"] = input;
         }
     }
 

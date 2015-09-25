@@ -36,7 +36,7 @@ namespace Schyntax.Internals
 
                 if (!hasExpressions)
                 {
-                    throw new InvalidScheduleException("Schedule must contain at least one expression.", Input);
+                    throw new SchyntaxParseException("Schedule must contain at least one expression.", Input, 0);
                 }
             }
 
