@@ -72,18 +72,60 @@ namespace Schyntax.Tests
 
         public abstract string SuiteName { get; }
 
-        public IEnumerable Checks => Suites[SuiteName].Checks.Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next });
+        public IEnumerable Checks => Suites[SuiteName].Checks.Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next, c.ParseErrorIndex });
 
         [TestCaseSource("Checks")]
-        public void Check(string format, DateTimeOffset start, DateTimeOffset prev, DateTimeOffset next)
+        public void Check(string format, DateTimeOffset start, DateTimeOffset? prev, DateTimeOffset? next, int? parseErrorIndex)
         {
-            var sch = new Schedule(format);
+            Schedule sch;
 
-            var actualPrev = sch.Previous(start);
-            Assert.AreEqual(prev.ToString("o"), actualPrev.ToString("o"), "Previous time was incorrect.");
+            try
+            {
+                sch = new Schedule(format);
 
-            var actualNext = sch.Next(start);
-            Assert.AreEqual(next.ToString("o"), actualNext.ToString("o"), "Next time was incorrect.");
+                if (parseErrorIndex.HasValue)
+                    throw new Exception($"Expected a parse error at index {parseErrorIndex}, but no exception was thrown.");
+            }
+            catch (SchyntaxParseException ex)
+            {
+                if (parseErrorIndex.HasValue)
+                {
+                    if (ex.Index == parseErrorIndex)
+                        return;
+
+                    throw new Exception($"Wrong parse error index. Expected: {parseErrorIndex}. Actual: {ex.Index}", ex);
+                }
+
+                throw;
+            }
+            
+            try
+            {
+                var actualPrev = sch.Previous(start);
+                if (!prev.HasValue)
+                    throw new Exception($"Expected a ValidTimeNotFoundException. Date returned from Previous: {actualPrev}.");
+
+                Assert.AreEqual(prev.Value.ToString("o"), actualPrev.ToString("o"), "Previous time was incorrect.");
+            }
+            catch (ValidTimeNotFoundException)
+            {
+                if (prev.HasValue)
+                    throw;
+            }
+
+            try
+            {
+                var actualNext = sch.Next(start);
+                if (!next.HasValue)
+                    throw new Exception($"Expected a ValidTimeNotFoundException. Date returned from Next: {actualNext}.");
+
+                Assert.AreEqual(next.Value.ToString("o"), actualNext.ToString("o"), "Next time was incorrect.");
+            }
+            catch (ValidTimeNotFoundException)
+            {
+                if (next.HasValue)
+                    throw;
+            }
         }
     }
 
@@ -102,9 +144,12 @@ namespace Schyntax.Tests
         public DateTimeOffset Date { get; set; }
 
         [JilDirective("prev")]
-        public DateTimeOffset Prev { get; set; }
+        public DateTimeOffset? Prev { get; set; }
 
         [JilDirective("next")]
-        public DateTimeOffset Next { get; set; }
+        public DateTimeOffset? Next { get; set; }
+
+        [JilDirective("parseErrorIndex")]
+        public int? ParseErrorIndex { get; set; }
     }
 }
