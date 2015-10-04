@@ -65,14 +65,14 @@ namespace Schyntax.Tests
 
     public abstract class SchyntaxTestRunner
     {
-        private static Dictionary<string, SchyntaxSuite> _suites;
+        private static SchyntaxTests _tests;
         
-        private static Dictionary<string, SchyntaxSuite> Suites
+        private static SchyntaxTests Tests
         {
             get
             {
-                if (_suites != null)
-                    return _suites;
+                if (_tests != null)
+                    return _tests;
 
                 var refs = Assembly.GetAssembly(typeof(SchyntaxTestRunner)).GetManifestResourceNames();
                 Console.WriteLine(refs);
@@ -81,16 +81,16 @@ namespace Schyntax.Tests
                 using (var stream = Assembly.GetAssembly(typeof(SchyntaxTestRunner)).GetManifestResourceStream("Schyntax.Tests.tests.json"))
                 using (var reader = new StreamReader(stream))
                 {
-                    _suites = JSON.Deserialize<Dictionary<string, SchyntaxSuite>>(reader, new Options(dateFormat: DateTimeFormat.ISO8601));
+                    _tests = JSON.Deserialize<SchyntaxTests>(reader, new Options(dateFormat: DateTimeFormat.ISO8601));
                 }
 
-                return _suites;
+                return _tests;
             }
         }
 
         public abstract string SuiteName { get; }
 
-        public IEnumerable Checks => Suites[SuiteName].Checks.Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next, c.ParseErrorIndex });
+        public IEnumerable Checks => Tests.Suites[SuiteName].Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next, c.ParseErrorIndex });
 
         [TestCaseSource("Checks")]
         public void Check(string format, DateTimeOffset start, DateTimeOffset? prev, DateTimeOffset? next, int? parseErrorIndex)
@@ -147,10 +147,13 @@ namespace Schyntax.Tests
         }
     }
 
-    public class SchyntaxSuite
+    public class SchyntaxTests
     {
-        [JilDirective("checks")]
-        public List<SchyntaxCheck> Checks { get; set; } 
+        [JilDirective("testsVersion")]
+        public int TestsVersion { get; set; }
+
+        [JilDirective("suites")]
+        public Dictionary<string, List<SchyntaxCheck>> Suites { get; set; }
     }
 
     public class SchyntaxCheck
