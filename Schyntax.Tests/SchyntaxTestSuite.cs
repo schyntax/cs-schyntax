@@ -152,6 +152,9 @@ namespace Schyntax.Tests
         [JilDirective("testsVersion")]
         public int TestsVersion { get; set; }
 
+        [JilDirective("hash")]
+        public string Hash { get; set; }
+
         [JilDirective("suites")]
         public Dictionary<string, List<SchyntaxCheck>> Suites { get; set; }
     }
