@@ -50,15 +50,23 @@ namespace Schyntax.Internals
         public bool HasDaysOfWeekExcluded => _daysOfWeekExcluded != null && _daysOfWeekExcluded.Count > 0;
         public List<IrIntegerRange> DaysOfWeekExcluded => _daysOfWeekExcluded ?? (_daysOfWeekExcluded = new List<IrIntegerRange>());
 
-        private List<IrIntegerRange> _daysOfMonth;
-        public bool HasDaysOfMonth => _daysOfMonth != null && _daysOfMonth.Count > 0;
-        public List<IrIntegerRange> DaysOfMonth => _daysOfMonth ?? (_daysOfMonth = new List<IrIntegerRange>());
+		private List<IrIntegerRange> _daysOfMonth;
+		public bool HasDaysOfMonth => _daysOfMonth != null && _daysOfMonth.Count > 0;
+		public List<IrIntegerRange> DaysOfMonth => _daysOfMonth ?? (_daysOfMonth = new List<IrIntegerRange>());
 
-        private List<IrIntegerRange> _daysOfMonthExcluded;
-        public bool HasDaysOfMonthExcluded => _daysOfMonthExcluded != null && _daysOfMonthExcluded.Count > 0;
-        public List<IrIntegerRange> DaysOfMonthExcluded => _daysOfMonthExcluded ?? (_daysOfMonthExcluded = new List<IrIntegerRange>());
+		private List<IrIntegerRange> _daysOfMonthExcluded;
+		public bool HasDaysOfMonthExcluded => _daysOfMonthExcluded != null && _daysOfMonthExcluded.Count > 0;
+		public List<IrIntegerRange> DaysOfMonthExcluded => _daysOfMonthExcluded ?? (_daysOfMonthExcluded = new List<IrIntegerRange>());
 
-        private List<IrDateRange> _dates;
+		private List<IrIntegerRange> _daysOfYear;
+		public bool HasDaysOfYear => _daysOfYear != null && _daysOfYear.Count > 0;
+		public List<IrIntegerRange> DaysOfYear => _daysOfYear ?? (this._daysOfYear = new List<IrIntegerRange>());
+
+		private List<IrIntegerRange> _daysOfYearExcluded;
+		public bool HasDaysOfYearExcluded => _daysOfYearExcluded != null && _daysOfYearExcluded.Count > 0;
+		public List<IrIntegerRange> DaysOfYearExcluded => _daysOfYearExcluded ?? (_daysOfYearExcluded = new List<IrIntegerRange>());
+
+		private List<IrDateRange> _dates;
         public bool HasDates => _dates != null && _dates.Count > 0;
         public List<IrDateRange> Dates => _dates ?? (_dates = new List<IrDateRange>());
 

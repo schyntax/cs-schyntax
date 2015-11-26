@@ -15,13 +15,19 @@ namespace Schyntax.Tests
         public override string SuiteName => "dates";
     }
 
-    [TestFixture]
-    public class DaysOfMonth : SchyntaxTestRunner
-    {
-        public override string SuiteName => "daysOfMonth";
-    }
+	[TestFixture]
+	public class DaysOfYear : SchyntaxTestRunner
+	{
+		public override string SuiteName => "daysOfYear";
+	}
 
-    [TestFixture]
+	[TestFixture]
+	public class DaysOfMonth : SchyntaxTestRunner
+	{
+		public override string SuiteName => "daysOfMonth";
+	}
+
+	[TestFixture]
     public class DaysOfWeek : SchyntaxTestRunner
     {
         public override string SuiteName => "daysOfWeek";
