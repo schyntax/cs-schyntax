@@ -62,8 +62,9 @@ namespace Schyntax.Internals
                 ConsumeOptionalTerm(Terms.Minutes) ||
                 ConsumeOptionalTerm(Terms.Hours) ||
                 ConsumeOptionalTerm(Terms.DaysOfWeek) ||
-                ConsumeOptionalTerm(Terms.DaysOfMonth) ||
-                ConsumeOptionalTerm(Terms.Dates))
+				ConsumeOptionalTerm(Terms.DaysOfMonth) ||
+				ConsumeOptionalTerm(Terms.DaysOfYear) ||
+				ConsumeOptionalTerm(Terms.Dates))
             {
                 ConsumeTerm(Terms.OpenParen);
                 EnterContext(ContextMode.Expression);

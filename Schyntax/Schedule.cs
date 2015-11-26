@@ -87,7 +87,8 @@ namespace Schyntax
             var initSecond = after ? 0 : 59;
 
             // todo: make the length of the search configurable
-            for (var d = 0; d < 367; d++)
+			// @Spiralis: Changed the range from 367 to 4*365, as we need to look ahead for leap-years.
+            for (var d = 0; d < (4*365); d++)
             {
                 DateTimeOffset date;
                 int hour, minute, second;
@@ -111,6 +112,7 @@ namespace Schyntax
 
                 var year = date.Year;
                 var month = date.Month;
+	            var dayOfYear = date.DayOfYear;
                 var dayOfWeek = (int)date.DayOfWeek + 1; // DayOfWeek enum is zero-indexed
                 var dayOfMonth = date.Day;
 
@@ -140,8 +142,34 @@ namespace Schyntax
                     }
                 }
 
-                // check if date is an applicable day of month
-                if (group.HasDaysOfMonth)
+				// check if date is an applicable day of month
+				if (group.HasDaysOfYear)
+				{
+					var applicable = false;
+					foreach (var range in group.DaysOfYear)
+					{
+						if (InDayOfYearRange(range, year, month, dayOfYear))
+						{
+							applicable = true;
+							break;
+						}
+					}
+
+					if (!applicable)
+						goto CONTINUE_DATE_LOOP;
+				}
+
+				if (group.HasDaysOfYearExcluded)
+				{
+					foreach (var range in group.DaysOfYearExcluded)
+					{
+						if (InDayOfYearRange(range, year, month, dayOfYear))
+							goto CONTINUE_DATE_LOOP;
+					}
+				}
+
+				// check if date is an applicable day of month
+				if (group.HasDaysOfMonth)
                 {
                     var applicable = false;
                     foreach (var range in group.DaysOfMonth)
@@ -342,22 +370,37 @@ namespace Schyntax
             return monthA > monthB ? 1 : -1;
         }
 
-        private static bool InDayOfMonthRange(IrIntegerRange range, int year, int month, int dayOfMonth)
-        {
-            if (range.Start < 0 || (range.IsRange && range.End < 0))
-            {
-                // one of the range values is negative, so we need to convert it to a positive by counting back from the end of the month
-                var daysInMonth = DateTime.DaysInMonth(year, month);
-                range = range.CloneWithRevisedRange(
-                    range.Start < 0 ? daysInMonth + range.Start + 1 : range.Start,
-                    range.End < 0 ? daysInMonth + range.End + 1 : range.End
-                );
-            }
+		private static bool InDayOfYearRange(IrIntegerRange range, int year, int month, int dayOfYear)
+		{
+			if (range.Start < 0 || (range.IsRange && range.End < 0))
+			{
+				// one of the range values is negative, so we need to convert it to a positive 
+				var daysInYear = DateTime.IsLeapYear(year) ? 366 : 365;
+				range = range.CloneWithRevisedRange(
+					range.Start < 0 ? daysInYear + range.Start + 1 : range.Start,
+					range.End < 0 ? daysInYear + range.End + 1 : range.End
+				);
+			}
+			var daysInPrevYear = DateTime.IsLeapYear(year-1) ? 366 : 365;
+			return InIntegerRange(range, dayOfYear, daysInPrevYear);
+		}
 
-            return InIntegerRange(range, dayOfMonth, DaysInPreviousMonth(year, month));
-        }
+		private static bool InDayOfMonthRange(IrIntegerRange range, int year, int month, int dayOfMonth)
+		{
+			if (range.Start < 0 || (range.IsRange && range.End < 0))
+			{
+				// one of the range values is negative, so we need to convert it to a positive by counting back from the end of the month
+				var daysInMonth = DateTime.DaysInMonth(year, month);
+				range = range.CloneWithRevisedRange(
+					range.Start < 0 ? daysInMonth + range.Start + 1 : range.Start,
+					range.End < 0 ? daysInMonth + range.End + 1 : range.End
+				);
+			}
 
-        private static bool InIntegerRange(IrIntegerRange range, int value, int lengthOfUnit)
+			return InIntegerRange(range, dayOfMonth, DaysInPreviousMonth(year, month));
+		}
+
+		private static bool InIntegerRange(IrIntegerRange range, int value, int lengthOfUnit)
         {
             if (!range.IsRange)
             {
@@ -396,16 +439,16 @@ namespace Schyntax
             return false;
         }
 
-        private static int DaysInPreviousMonth(int year, int month)
-        {
-            month--;
-            if (month == 0)
-            {
-                year--;
-                month = 12;
-            }
+		private static int DaysInPreviousMonth(int year, int month)
+		{
+			month--;
+			if (month == 0)
+			{
+				year--;
+				month = 12;
+			}
 
-            return DateTime.DaysInMonth(year, month);
-        }
-    }
+			return DateTime.DaysInMonth(year, month);
+		}
+	}
 }
