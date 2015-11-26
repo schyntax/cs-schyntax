@@ -63,6 +63,7 @@ namespace Schyntax.Internals
                 ConsumeOptionalTerm(Terms.Hours) ||
                 ConsumeOptionalTerm(Terms.DaysOfWeek) ||
                 ConsumeOptionalTerm(Terms.DaysOfMonth) ||
+                ConsumeOptionalTerm(Terms.DaysOfYear) ||
                 ConsumeOptionalTerm(Terms.Dates))
             {
                 ConsumeTerm(Terms.OpenParen);
