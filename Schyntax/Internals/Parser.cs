@@ -157,7 +157,7 @@ namespace Schyntax.Internals
             }
             else if (IsNext(TokenType.NegativeInteger))
             {
-				if (expressionType != ExpressionType.DaysOfMonth && expressionType != ExpressionType.DaysOfYear)
+                if (expressionType != ExpressionType.DaysOfMonth && expressionType != ExpressionType.DaysOfYear)
                 {
                     throw new SchyntaxParseException("Negative values are only allowed in dayofmonth and dayofyear expressions.", Input, Peek().Index);
                 }
@@ -184,10 +184,10 @@ namespace Schyntax.Internals
             {
                 switch (expressionType)
                 {
-					case ExpressionType.DaysOfYear:
-					case ExpressionType.DaysOfMonth:
-						throw WrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger);
-					case ExpressionType.DaysOfWeek:
+                    case ExpressionType.DaysOfYear:
+                    case ExpressionType.DaysOfMonth:
+                        throw WrongTokenException(TokenType.PositiveInteger, TokenType.NegativeInteger);
+                    case ExpressionType.DaysOfWeek:
                         throw WrongTokenException(TokenType.PositiveInteger, TokenType.DayLiteral);
                     default:
                         throw WrongTokenException(TokenType.PositiveInteger);

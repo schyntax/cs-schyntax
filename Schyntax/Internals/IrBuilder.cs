@@ -84,13 +84,13 @@ namespace Schyntax.Internals
                     case ExpressionType.DaysOfWeek:
                         CompileDaysOfWeekArgument(irGroup, arg);
                         break;
-					case ExpressionType.DaysOfMonth:
-						CompileDaysOfMonthArgument(irGroup, arg);
-						break;
-					case ExpressionType.DaysOfYear:
-						CompileDaysOfYearArgument(irGroup, arg);
-						break;
-					case ExpressionType.Dates:
+                    case ExpressionType.DaysOfMonth:
+                        CompileDaysOfMonthArgument(irGroup, arg);
+                        break;
+                    case ExpressionType.DaysOfYear:
+                        CompileDaysOfYearArgument(irGroup, arg);
+                        break;
+                    case ExpressionType.Dates:
                         CompileDateArgument(irGroup, arg);
                         break;
                     default:
@@ -165,19 +165,19 @@ namespace Schyntax.Internals
             (arg.IsExclusion ? irGroup.DaysOfWeekExcluded : irGroup.DaysOfWeek).Add(irArg);
         }
 
-		private static void CompileDaysOfMonthArgument(IrGroup irGroup, ArgumentNode arg)
-		{
-			var irArg = CompileIntegerArgument(arg, 1, 31);
-			(arg.IsExclusion ? irGroup.DaysOfMonthExcluded : irGroup.DaysOfMonth).Add(irArg);
-		}
+        private static void CompileDaysOfMonthArgument(IrGroup irGroup, ArgumentNode arg)
+        {
+            var irArg = CompileIntegerArgument(arg, 1, 31);
+            (arg.IsExclusion ? irGroup.DaysOfMonthExcluded : irGroup.DaysOfMonth).Add(irArg);
+        }
 
-		private static void CompileDaysOfYearArgument(IrGroup irGroup, ArgumentNode arg)
-		{
-			var irArg = CompileIntegerArgument(arg, 1, 366);
-			(arg.IsExclusion ? irGroup.DaysOfYearExcluded : irGroup.DaysOfYear).Add(irArg);
-		}
+        private static void CompileDaysOfYearArgument(IrGroup irGroup, ArgumentNode arg)
+        {
+            var irArg = CompileIntegerArgument(arg, 1, 366);
+            (arg.IsExclusion ? irGroup.DaysOfYearExcluded : irGroup.DaysOfYear).Add(irArg);
+        }
 
-		private static IrIntegerRange CompileIntegerArgument(ArgumentNode arg, int wildStart, int wildEnd)
+        private static IrIntegerRange CompileIntegerArgument(ArgumentNode arg, int wildStart, int wildEnd)
         {
             int start;
             int? end;

@@ -55,8 +55,8 @@ namespace Schyntax.Internals
         Hours,
         DaysOfWeek,
         DaysOfMonth,
-		DaysOfYear,
-		Dates,
+        DaysOfYear,
+        Dates,
     }
 
     public class ExpressionNode : Node

@@ -114,11 +114,11 @@ namespace Schyntax.Internals
                     return Hour;
                 case ExpressionType.DaysOfWeek:
                     return DayOfWeek;
-				case ExpressionType.DaysOfMonth:
-					return DayOfMonth;
-				case ExpressionType.DaysOfYear:
-					return DayOfYear;
-				case ExpressionType.Dates:
+                case ExpressionType.DaysOfMonth:
+                    return DayOfMonth;
+                case ExpressionType.DaysOfYear:
+                    return DayOfYear;
+                case ExpressionType.Dates:
                     return Date;
                 default:
                     throw new NotImplementedException("ExpressionType " + expType + " has not been implemented by the validator.");
@@ -170,21 +170,21 @@ namespace Schyntax.Internals
             IntegerValue(expType, value, 1, 7);
         }
 
-		private void DayOfMonth(ExpressionType expType, ValueNode value)
-		{
-			var ival = IntegerValue(expType, value, -31, 31);
-			if (ival == 0)
-				throw new SchyntaxParseException("Day of month cannot be zero.", Input, value.Index);
-		}
+        private void DayOfMonth(ExpressionType expType, ValueNode value)
+        {
+            var ival = IntegerValue(expType, value, -31, 31);
+            if (ival == 0)
+                throw new SchyntaxParseException("Day of month cannot be zero.", Input, value.Index);
+        }
 
-		private void DayOfYear(ExpressionType expType, ValueNode value)
-		{
-			var ival = IntegerValue(expType, value, -366, 366);
-			if (ival == 0)
-				throw new SchyntaxParseException("Day of year cannot be zero.", Input, value.Index);
-		}
+        private void DayOfYear(ExpressionType expType, ValueNode value)
+        {
+            var ival = IntegerValue(expType, value, -366, 366);
+            if (ival == 0)
+                throw new SchyntaxParseException("Day of year cannot be zero.", Input, value.Index);
+        }
 
-		private void Date(ExpressionType expType, ValueNode value)
+        private void Date(ExpressionType expType, ValueNode value)
         {
             var date = (DateValueNode)value;
 
@@ -269,11 +269,11 @@ namespace Schyntax.Internals
         {
             switch (type)
             {
-				case ExpressionType.DaysOfYear:
-					return "days of the year";
-				case ExpressionType.DaysOfMonth:
-					return "days of the month";
-				case ExpressionType.DaysOfWeek:
+                case ExpressionType.DaysOfYear:
+                    return "days of the year";
+                case ExpressionType.DaysOfMonth:
+                    return "days of the month";
+                case ExpressionType.DaysOfWeek:
                     return "days of the week";
                 case ExpressionType.IntervalValue:
                     return "interval";
