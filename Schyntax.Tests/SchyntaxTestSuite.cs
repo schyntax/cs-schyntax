@@ -16,6 +16,12 @@ namespace Schyntax.Tests
     }
 
     [TestFixture]
+    public class Months : SchyntaxTestRunner
+    {
+        public override string SuiteName => "months";
+    }
+
+    [TestFixture]
     public class DaysOfYear : SchyntaxTestRunner
     {
         public override string SuiteName => "daysOfYear";

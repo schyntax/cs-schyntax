@@ -66,6 +66,14 @@ namespace Schyntax.Internals
         public bool HasDaysOfYearExcluded => _daysOfYearExcluded != null && _daysOfYearExcluded.Count > 0;
         public List<IrIntegerRange> DaysOfYearExcluded => _daysOfYearExcluded ?? (_daysOfYearExcluded = new List<IrIntegerRange>());
 
+        private List<IrIntegerRange> _months;
+        public bool HasMonths => _months != null && _months.Count > 0;
+        public List<IrIntegerRange> Months => _months ?? (this._months = new List<IrIntegerRange>());
+
+        private List<IrIntegerRange> _monthsExcluded;
+        public bool HasMonthsExcluded => _monthsExcluded != null && _monthsExcluded.Count > 0;
+        public List<IrIntegerRange> MonthsExcluded => _monthsExcluded ?? (_monthsExcluded = new List<IrIntegerRange>());
+
         private List<IrDateRange> _dates;
         public bool HasDates => _dates != null && _dates.Count > 0;
         public List<IrDateRange> Dates => _dates ?? (_dates = new List<IrDateRange>());

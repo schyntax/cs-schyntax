@@ -42,6 +42,11 @@ namespace Schyntax.Internals
                 CompileExpression(irGroup, expression);
             }
 
+            if (irGroup.HasMonths || irGroup.HasMonthsExcluded)
+            {
+                irGroup.DaysOfMonth.Add(GetSingleIrIntegerRange(1));
+            }
+
             // setup implied rules
             if (irGroup.HasSeconds || irGroup.HasSecondsExcluded)
             {
@@ -89,6 +94,9 @@ namespace Schyntax.Internals
                         break;
                     case ExpressionType.DaysOfYear:
                         CompileDaysOfYearArgument(irGroup, arg);
+                        break;
+                    case ExpressionType.Months:
+                        CompileMonthsArgument(irGroup, arg);
                         break;
                     case ExpressionType.Dates:
                         CompileDateArgument(irGroup, arg);
@@ -177,6 +185,12 @@ namespace Schyntax.Internals
             (arg.IsExclusion ? irGroup.DaysOfYearExcluded : irGroup.DaysOfYear).Add(irArg);
         }
 
+        private static void CompileMonthsArgument(IrGroup irGroup, ArgumentNode arg)
+        {
+            var irArg = CompileIntegerArgument(arg, 1, 12);
+            (arg.IsExclusion ? irGroup.MonthsExcluded : irGroup.Months).Add(irArg);
+        }
+
         private static IrIntegerRange CompileIntegerArgument(ArgumentNode arg, int wildStart, int wildEnd)
         {
             int start;
@@ -220,7 +234,12 @@ namespace Schyntax.Internals
 
         private static IrIntegerRange GetZeroInteger()
         {
-            return new IrIntegerRange(0, null, 0, false, false);
+            return GetSingleIrIntegerRange(0);
+        }
+
+        private static IrIntegerRange GetSingleIrIntegerRange(int val)
+        {
+            return new IrIntegerRange(val, null, 0, false, false);
         }
     }
 }

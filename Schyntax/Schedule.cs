@@ -142,7 +142,7 @@ namespace Schyntax
                     }
                 }
 
-                // check if date is an applicable day of month
+                // check if date is an applicable day of year
                 if (group.HasDaysOfYear)
                 {
                     var applicable = false;
@@ -193,6 +193,13 @@ namespace Schyntax
                             goto CONTINUE_DATE_LOOP;
                     }
                 }
+
+                // check if date is an applicable month
+                if (group.HasMonths && !InRule(12, group.Months, month))
+                    goto CONTINUE_DATE_LOOP;
+
+                if (group.HasMonthsExcluded && InRule(12, group.MonthsExcluded, month))
+                    goto CONTINUE_DATE_LOOP;
 
                 // check if date is an applicable day of week
                 if (group.HasDaysOfWeek && !InRule(7, group.DaysOfWeek, dayOfWeek))

@@ -56,6 +56,7 @@ namespace Schyntax.Internals
         DaysOfWeek,
         DaysOfMonth,
         DaysOfYear,
+        Months,
         Dates,
     }
 

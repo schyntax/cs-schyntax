@@ -36,5 +36,6 @@
         NegativeInteger,
         ExpressionName,
         DayLiteral,
+        MonthLiteral,
     }
 }

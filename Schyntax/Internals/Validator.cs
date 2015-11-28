@@ -118,6 +118,8 @@ namespace Schyntax.Internals
                     return DayOfMonth;
                 case ExpressionType.DaysOfYear:
                     return DayOfYear;
+                case ExpressionType.Months:
+                    return Month;
                 case ExpressionType.Dates:
                     return Date;
                 default:
@@ -168,6 +170,11 @@ namespace Schyntax.Internals
         private void DayOfWeek(ExpressionType expType, ValueNode value)
         {
             IntegerValue(expType, value, 1, 7);
+        }
+
+        private void Month(ExpressionType expType, ValueNode value)
+        {
+            IntegerValue(expType, value, 1, 12);
         }
 
         private void DayOfMonth(ExpressionType expType, ValueNode value)
@@ -269,6 +276,8 @@ namespace Schyntax.Internals
         {
             switch (type)
             {
+                case ExpressionType.Months:
+                    return "months of the year";
                 case ExpressionType.DaysOfYear:
                     return "days of the year";
                 case ExpressionType.DaysOfMonth:
