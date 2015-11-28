@@ -29,11 +29,27 @@ namespace Schyntax.Internals
         public static Terminal Friday { get; } = new Terminal(TokenType.DayLiteral, "FRIDAY", new Regex(@"\G(fr|fri|friday)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Saturday { get; } = new Terminal(TokenType.DayLiteral, "SATURDAY", new Regex(@"\G(sa|sat|saturday)(?:\b)", RegexOptions.IgnoreCase));
 
+        public static Terminal January { get; } = new Terminal(TokenType.MonthLiteral, "JANUARY", new Regex(@"\G(jan|january)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal February { get; } = new Terminal(TokenType.MonthLiteral, "FEBRUARY", new Regex(@"\G(feb|february)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal March { get; } = new Terminal(TokenType.MonthLiteral, "MARCH", new Regex(@"\G(mar|march)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal April{ get; } = new Terminal(TokenType.MonthLiteral, "APRIL", new Regex(@"\G(apr|april)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal May { get; } = new Terminal(TokenType.MonthLiteral, "MAY", new Regex(@"\G(may)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal June { get; } = new Terminal(TokenType.MonthLiteral, "JUNE", new Regex(@"\G(jun|june)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal July { get; } = new Terminal(TokenType.MonthLiteral, "JULY", new Regex(@"\G(jul|july)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal August { get; } = new Terminal(TokenType.MonthLiteral, "AUGUST", new Regex(@"\G(aug|august)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal September { get; } = new Terminal(TokenType.MonthLiteral, "SEPTEMBER", new Regex(@"\G(sep|september)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal October { get; } = new Terminal(TokenType.MonthLiteral, "OCTOBER", new Regex(@"\G(oct|october)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal November { get; } = new Terminal(TokenType.MonthLiteral, "NOVEMBER", new Regex(@"\G(nov|november)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal December { get; } = new Terminal(TokenType.MonthLiteral, "DECEMBER", new Regex(@"\G(dec|december)(?:\b)", RegexOptions.IgnoreCase));
+
+
         public static Terminal Seconds { get; } = new Terminal(ExpressionType.Seconds, new Regex(@"\G(s|sec|second|seconds|secondofminute|secondsofminute)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Minutes { get; } = new Terminal(ExpressionType.Minutes, new Regex(@"\G(m|min|minute|minutes|minuteofhour|minutesofhour)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Hours { get; } = new Terminal(ExpressionType.Hours, new Regex(@"\G(h|hour|hours|hourofday|hoursofday)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal DaysOfWeek { get; } = new Terminal(ExpressionType.DaysOfWeek, new Regex(@"\G(day|days|dow|dayofweek|daysofweek)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal DaysOfMonth { get; } = new Terminal(ExpressionType.DaysOfMonth, new Regex(@"\G(dom|dayofmonth|daysofmonth)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal DaysOfYear { get; } = new Terminal(ExpressionType.DaysOfYear, new Regex(@"\G(doy|dayofyear|daysofyear)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal Months { get; } = new Terminal(ExpressionType.Months, new Regex(@"\G(month|months)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Dates { get; } = new Terminal(ExpressionType.Dates, new Regex(@"\G(date|dates)(?:\b)", RegexOptions.IgnoreCase));
 
         internal class Terminal

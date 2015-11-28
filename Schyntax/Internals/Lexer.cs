@@ -63,6 +63,8 @@ namespace Schyntax.Internals
                 ConsumeOptionalTerm(Terms.Hours) ||
                 ConsumeOptionalTerm(Terms.DaysOfWeek) ||
                 ConsumeOptionalTerm(Terms.DaysOfMonth) ||
+                ConsumeOptionalTerm(Terms.DaysOfYear) ||
+                ConsumeOptionalTerm(Terms.Months) ||
                 ConsumeOptionalTerm(Terms.Dates))
             {
                 ConsumeTerm(Terms.OpenParen);
@@ -80,11 +82,11 @@ namespace Schyntax.Internals
 
             if (!ConsumeOptionalTerm(Terms.Wildcard))
             {
-                ConsumeNumberDayOrDate();
+                ConsumeNumberDayMonthOrDate();
 
                 // might be a range
                 if (ConsumeOptionalTerm(Terms.RangeHalfOpen) || ConsumeOptionalTerm(Terms.RangeInclusive))
-                    ConsumeNumberDayOrDate();
+                    ConsumeNumberDayMonthOrDate();
             }
 
             if (ConsumeOptionalTerm(Terms.Interval))
@@ -96,7 +98,7 @@ namespace Schyntax.Internals
         }
 
         // this lexes a number, day, or date
-        private void ConsumeNumberDayOrDate()
+        private void ConsumeNumberDayMonthOrDate()
         {
             if (ConsumeOptionalTerm(Terms.PositiveInteger))
             {
@@ -120,7 +122,19 @@ namespace Schyntax.Internals
                 ConsumeOptionalTerm(Terms.Wednesday) ||
                 ConsumeOptionalTerm(Terms.Thursday) ||
                 ConsumeOptionalTerm(Terms.Friday) ||
-                ConsumeOptionalTerm(Terms.Saturday))
+                ConsumeOptionalTerm(Terms.Saturday) ||
+                ConsumeOptionalTerm(Terms.January) ||
+                ConsumeOptionalTerm(Terms.February) ||
+                ConsumeOptionalTerm(Terms.March) ||
+                ConsumeOptionalTerm(Terms.April) ||
+                ConsumeOptionalTerm(Terms.May) ||
+                ConsumeOptionalTerm(Terms.June) ||
+                ConsumeOptionalTerm(Terms.July) ||
+                ConsumeOptionalTerm(Terms.August) ||
+                ConsumeOptionalTerm(Terms.September) ||
+                ConsumeOptionalTerm(Terms.October) ||
+                ConsumeOptionalTerm(Terms.November) ||
+                ConsumeOptionalTerm(Terms.December))
             {
                 return;
             }
