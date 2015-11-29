@@ -34,6 +34,7 @@ namespace Schyntax.Internals
         public static Terminal Hours { get; } = new Terminal(ExpressionType.Hours, new Regex(@"\G(h|hour|hours|hourofday|hoursofday)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal DaysOfWeek { get; } = new Terminal(ExpressionType.DaysOfWeek, new Regex(@"\G(day|days|dow|dayofweek|daysofweek)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal DaysOfMonth { get; } = new Terminal(ExpressionType.DaysOfMonth, new Regex(@"\G(dom|dayofmonth|daysofmonth)(?:\b)", RegexOptions.IgnoreCase));
+        public static Terminal DaysOfYear { get; } = new Terminal(ExpressionType.DaysOfYear, new Regex(@"\G(doy|dayofyear|daysofyear)(?:\b)", RegexOptions.IgnoreCase));
         public static Terminal Dates { get; } = new Terminal(ExpressionType.Dates, new Regex(@"\G(date|dates)(?:\b)", RegexOptions.IgnoreCase));
 
         internal class Terminal
