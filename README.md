@@ -2,6 +2,7 @@
 
 [![NuGet version](https://badge.fury.io/nu/Schyntax.svg)](http://badge.fury.io/nu/Schyntax)
 [![Build status](https://ci.appveyor.com/api/projects/status/y1ij5ty5hv2gx1qd/branch/master?svg=true)](https://ci.appveyor.com/project/bretcope/cs-schyntax/branch/master)
+<sup>Supported Schyntax Version: [1.0.1](https://github.com/schyntax/schyntax/tree/v1.0.1)</sup>
 
 [Schyntax](https://github.com/schyntax/schyntax) is a domain-specific language for defining event schedules in a terse, but readable, format. For example, if you want something to run every five minutes during work hours on weekdays, you could write `days(mon..fri) hours(9..<17) min(*%5)`. This project is the reference implementation of Schyntax.
 
