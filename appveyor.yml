@@ -48,16 +48,16 @@ deploy:
     on:
       appveyor_repo_tag: true
 
- # MyGet
- - provider: NuGet
-   server: https://www.myget.org/F/schyntax/api/v2/package
-   symbol_server: https://www.myget.org/F/schyntax/symbols/api/v2/package
-   api_key:
-     secure: 4OhfGM3pJQHTs5OYskc448dwXt8DqPec7vdyK+G+AS5v0m8pSxyP30UoZyTanDcz
-   artifact: /artifacts/.*\.nupkg/
-   skip_symbols: false
-   on:
-     branch: master
+  # MyGet
+  - provider: NuGet
+    server: https://www.myget.org/F/schyntax/api/v2/package
+    symbol_server: https://www.myget.org/F/schyntax/symbols/api/v2/package
+    api_key:
+      secure: 4OhfGM3pJQHTs5OYskc448dwXt8DqPec7vdyK+G+AS5v0m8pSxyP30UoZyTanDcz
+    artifact: /artifacts/.*\.nupkg/
+    skip_symbols: false
+    on:
+      branch: master
 
   # NuGet.org
   - provider: NuGet
