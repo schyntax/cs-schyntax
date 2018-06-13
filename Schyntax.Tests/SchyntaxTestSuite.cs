@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -12,67 +12,67 @@ namespace Schyntax.Tests
     [TestFixture]
     public class Dates : SchyntaxTestRunner
     {
-        public override string SuiteName => "dates";
+        public static IEnumerable Suite => GetSuite("dates");
     }
 
     [TestFixture]
     public class DaysOfYear : SchyntaxTestRunner
     {
-        public override string SuiteName => "daysOfYear";
+        public static IEnumerable Suite => GetSuite("daysOfYear");
     }
 
     [TestFixture]
     public class DaysOfMonth : SchyntaxTestRunner
     {
-        public override string SuiteName => "daysOfMonth";
+        public static IEnumerable Suite => GetSuite("daysOfMonth");
     }
 
     [TestFixture]
     public class DaysOfWeek : SchyntaxTestRunner
     {
-        public override string SuiteName => "daysOfWeek";
+        public static IEnumerable Suite => GetSuite("daysOfWeek");
     }
 
     [TestFixture]
     public class Hours : SchyntaxTestRunner
     {
-        public override string SuiteName => "hours";
+        public static IEnumerable Suite => GetSuite("hours");
     }
 
     [TestFixture]
     public class Minutes : SchyntaxTestRunner
     {
-        public override string SuiteName => "minutes";
+        public static IEnumerable Suite => GetSuite("minutes");
     }
 
     [TestFixture]
     public class Seconds : SchyntaxTestRunner
     {
-        public override string SuiteName => "seconds";
+        public static IEnumerable Suite => GetSuite("seconds");
     }
 
     [TestFixture]
     public class SyntaxErrors : SchyntaxTestRunner
     {
-        public override string SuiteName => "syntaxErrors";
+        public static IEnumerable Suite => GetSuite("syntaxErrors");
     }
 
     [TestFixture]
     public class ArgumentErrors : SchyntaxTestRunner
     {
-        public override string SuiteName => "argumentErrors";
+        public static IEnumerable Suite => GetSuite("argumentErrors");
     }
 
     [TestFixture]
     public class Commas : SchyntaxTestRunner
     {
-        public override string SuiteName => "commas";
+        public static IEnumerable Suite => GetSuite("commas");
     }
 
     public abstract class SchyntaxTestRunner
     {
         private static SchyntaxTests _tests;
-        
+
         private static SchyntaxTests Tests
         {
             get
@@ -94,11 +94,9 @@ namespace Schyntax.Tests
             }
         }
 
-        public abstract string SuiteName { get; }
+        protected static IEnumerable GetSuite(string suiteName) => Tests.Suites[suiteName].Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next, c.ParseErrorIndex });
 
-        public IEnumerable Checks => Tests.Suites[SuiteName].Select(c => new object[] { c.Format, c.Date, c.Prev, c.Next, c.ParseErrorIndex });
-
-        [TestCaseSource("Checks")]
+        [TestCaseSource("Suite")]
         public void Check(string format, DateTimeOffset start, DateTimeOffset? prev, DateTimeOffset? next, int? parseErrorIndex)
         {
             Schedule sch;
@@ -122,7 +120,7 @@ namespace Schyntax.Tests
 
                 throw;
             }
-            
+
             try
             {
                 var actualPrev = sch.Previous(start);
