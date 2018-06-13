@@ -81,7 +81,6 @@ namespace Schyntax.Tests
                     return _tests;
 
                 var refs = Assembly.GetAssembly(typeof(SchyntaxTestRunner)).GetManifestResourceNames();
-                Console.WriteLine(refs);
 
                 // load json file
                 using (var stream = Assembly.GetAssembly(typeof(SchyntaxTestRunner)).GetManifestResourceStream("Schyntax.Tests.tests.json"))
